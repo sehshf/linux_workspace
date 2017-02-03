@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 	const int AREA_MIN = 20 * 20;
 	const int AREA_MAX = 640 * 480 * 3 / 4;
 
-	int area, lastArea, numDtc;
+	int area, lastArea;
 	boolean_T dtcdFlag;
 
 	printf("Start video capturing\n");
@@ -57,8 +57,8 @@ int main(int argc, char *argv[])
 	cvNamedWindow("piWindow", CV_WINDOW_AUTOSIZE);
 	cvMoveWindow("piWindow", 400, 200);
 
-	cvNamedWindow("piWindow2", CV_WINDOW_AUTOSIZE);
-	cvMoveWindow("piWindow2", 1100, 200);
+//	cvNamedWindow("piWindow2", CV_WINDOW_AUTOSIZE);
+//	cvMoveWindow("piWindow2", 1100, 200);
 
 //	cvNamedWindow("cnt", CV_WINDOW_AUTOSIZE);
 //	cvMoveWindow("piWindow2", 1100, 400);
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 		}
 
 		cvShowImage("piWindow" , img );
-		cvShowImage("piWindow2", imgFild);
+		//cvShowImage("piWindow2", imgFild);
 
 		// wait for a key
 		cvWaitKey(30);
