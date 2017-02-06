@@ -6,10 +6,10 @@
 #
 
 # define the C compiler to use
-CC = arm-linux-gnueabihf-gcc
+CC = arm-linux-gnueabihf-g++
 
 # define any compile-time flags
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -std=gnu++11
 
 # define library paths in addition to /usr/lib
 #   if I wanted to include libraries not in /usr/lib I'd specify
