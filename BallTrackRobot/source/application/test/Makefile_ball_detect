@@ -23,7 +23,7 @@ LIBS = -lm -lpthread -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_im
 #LIBS = -lmylib -lm
 
 # Output executable file
-OUTPUTFILE = TestBallTrack
+OUTPUTFILE = TestBallDetect
 
 # Path
 HOME			= /home/ses
@@ -55,7 +55,7 @@ SRC_DIRS = $(subst :, ,$(VPATH))
 
 SRCS = 				\
 computer_vision.c	\
-test_ball_track.c
+test_ball_detect.c
 
 # define the C object files 
 #

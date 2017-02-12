@@ -33,13 +33,6 @@
 #define CV_SIZE_W   640
 #define CV_SIZE_H   480
 
-//#define H_MIN	30
-//#define H_MAX	64
-//#define S_MIN	86
-//#define S_MAX	255
-//#define V_MIN	34
-//#define V_MAX	255
-
 
 /*
  * **************************************************
@@ -55,7 +48,7 @@
  * **************************************************
  */
 // HSV filter
-typedef enum
+enum
 {
 	H_MIN,
 	H_MAX,
@@ -64,8 +57,14 @@ typedef enum
 	V_MIN,
 	V_MAX,
 	HSV_LEN
-} HSV_FILT;
+};
 
+// Ball location
+typedef struct
+{
+    int32_T x;
+    int32_T y;
+} ballLoc_T;
 
 /*
  * **************************************************
@@ -81,8 +80,11 @@ typedef enum
  * PROTOTYPES										*
  * **************************************************
  */
-void BallFiltTune(IplImage *img, int32_T x, int32_T y);
+void TuneBallFilt(IplImage *img, int32_T x, int32_T y);
 
+void FiltBall(IplImage *img);
+
+boolean_T FindBall(IplImage *img, ballLoc_T *loc);
 
 #endif // _COMPUTER_VISION_H_
 
