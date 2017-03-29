@@ -24,9 +24,14 @@
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.722999840" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
 								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.option.optimization.level.148095485" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.479264444" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.include.paths.1756527504" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+								<option id="gnu.c.compiler.option.include.paths.1756527504" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="/home/ses/opencv-3.2.0/build/install/include"/>
 									<listOptionValue builtIn="false" value="/home/ses/opencv-3.2.0/build/install/include/opencv"/>
+									<listOptionValue builtIn="false" value="/home/ses/rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/arm-linux-gnueabihf/include"/>
+									<listOptionValue builtIn="false" value="/home/ses/rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/arm-linux-gnueabihf/libc/usr/include"/>
+									<listOptionValue builtIn="false" value="/home/ses/rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/arm-linux-gnueabihf/libc/usr/include/arm-linux-gnueabihf"/>
+									<listOptionValue builtIn="false" value="/home/ses/rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/lib/gcc/arm-linux-gnueabihf/4.8.3/include"/>
+									<listOptionValue builtIn="false" value="/home/ses/rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian-x64/arm-linux-gnueabihf/libc/usr/include-fixed"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1723315964" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>

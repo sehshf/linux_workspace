@@ -1,23 +1,24 @@
 /*
- * computer_vision.h
+ * gpio.h
  *
- *  Created on: Feb 3, 2017
+ *  Created on: Mar 29, 2017
  *      Author: ses
  */
 
-#ifndef _COMPUTER_VISION_H_
-#define _COMPUTER_VISION_H_
-
+#ifndef _GPIO_H_
+#define _GPIO_H_
 
 /*
  * **************************************************
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
+#include <stdio.h>
 #include <stdlib.h>
-#include <cv.h>
-#include <highgui.h>
-#include <opencv2/opencv.hpp>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <unistd.h>
 
 /*
  * **************************************************
@@ -31,9 +32,17 @@
  * DEFINITIONS										*
  * **************************************************
  */
-#define CV_SIZE_W   640
-#define CV_SIZE_H   480
+enum {GPIO_IN ,
+	  GPIO_OUT,
+	  GPIO_ALT
+	 };
 
+#define MMAP_GPIO_SIZE   (4 * 1024)
+#define PERI_BASE_ADR    0x3F000000    					// BCM2838 Peripheral starting address
+#define GPIO_BASE_ADR    (PERI_BASE_ADR + 0x200000)    	// GPIO starting address
+#define GPIO_SET			 7								// GPIO pin output set, IOs 0-31
+#define GPIO_CLR			 10								// GPIO pin output clear, IOs 0-31
+#define GPIO_LVL 			 13 							// GPIO Pin Level, IOs 0-31
 
 /*
  * **************************************************
@@ -48,24 +57,8 @@
  * TYPE DEFINITIONS									*
  * **************************************************
  */
-// HSV filter
-enum
-{
-	H_MIN,
-	H_MAX,
-	S_MIN,
-	S_MAX,
-	V_MIN,
-	V_MAX,
-	HSV_LEN
-};
 
-// Ball location
-typedef struct
-{
-    int32_T x;
-    int32_T y;
-} ballLoc_T;
+
 
 /*
  * **************************************************
@@ -81,13 +74,14 @@ typedef struct
  * PROTOTYPES										*
  * **************************************************
  */
-void TuneBallFilt(IplImage *img, int32_T x, int32_T y);
+volatile uint32_T *MemMapGPIO(void);
+void ConfigGPIO(volatile uint32_T *mmapAdr, uint16_T gpio, uint16_T flag, uint16_T alt);
+void MemUnMapGPIO(void *pMap, int32_T fd);
+void SetGPIO(volatile uint32_T *mmapAdr, uint16_T gpio);
+void ClrGPIO(volatile uint32_T *mmapAdr, uint16_T gpio);
+boolean_T ReadGPIO(volatile uint32_T *mmapAdr, uint16_T gpio);
 
-void FiltBall(IplImage *img);
 
-boolean_T FindBall(IplImage *img, ballLoc_T *loc);
+#endif // _GPIO_H_
 
-#endif // _COMPUTER_VISION_H_
-
-// EOF: computer_vision.h
-
+// EOF: gpio.h
