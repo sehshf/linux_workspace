@@ -83,17 +83,18 @@ typedef double 							real64_T;
  * MACRO											*
  * **************************************************
  */
-#define min(a, b)		(((a) < (b)) ? (a) : (b))
-#define max(a, b)		(((a) > (b)) ? (a) : (b))
+#define min(a, b)			(((a) < (b)) ? (a) : (b))
+#define max(a, b)			(((a) > (b)) ? (a) : (b))
 
-#define BITSET(a, bit)	((a) |=  (bit))
-#define BITCLR(a, bit)	((a) &= ~(bit))
+#define SETBIT(a, bit)		((a) |=  1 << (bit))
+#define CLRBIT(a, bit)		((a) &= ~(1 << (bit)))
 
-#define BYTE_L(w)		((uint8_T)(w))
-#define BYTE_H(w)		((uint8_T)((uint16_T)(w) >> 8))
+#define BYTE_L(w)			((uint8_T)(w))
+#define BYTE_H(w)			((uint8_T)((uint16_T)(w) >> 8))
 
-#define NUM_ELEM(array) (sizeof(array) / sizeof(*(array)))
+#define NUM_ELEM(array) 	(sizeof(array) / sizeof(*(array)))
 
+#define RDBIT(a, bit)		(((a) >> (bit)) & 0x01)				// Read bit of a
 
 #endif // _PORTABLE_H_
 

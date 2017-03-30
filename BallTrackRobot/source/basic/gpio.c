@@ -46,12 +46,13 @@
 *  -------------------------------------------------------  *
 *  FUNCTION:
 *      MEMMAPGPIO()
-*      configure ....
+*      Open "/dev/mem" file containing GPIO registers and
+*      map it to memory.
 *
 *  Inputs:
 *
 *  Outputs:
-*
+*		pMap : returns starting address of mapping
 *
 *  Author: Ehsan Shafiei
 *  		   Mar 2017
@@ -80,12 +81,15 @@ volatile uint32_T *MemMapGPIO(void)
 *  -------------------------------------------------------  *
 *  FUNCTION:
 *      CONFIGGPIO()
-*      configure ....
+*      Configure GPIO as input, output or an alternative.
 *
 *  Inputs:
+*  		*mmapAdr : pointer to the GPIO mapped adress.
+*  		gpio 	 : gpio number
+*  		flag 	 : flag specifying the configuration type
+*  		alt 	 : alternative type number
 *
 *  Outputs:
-*
 *
 *  Author: Ehsan Shafiei
 *  		   Mar 2017
@@ -113,13 +117,14 @@ void ConfigGPIO(volatile uint32_T *mmapAdr, uint16_T gpio, uint16_T flag, uint16
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      CONFIGGPIO()
-*      configure ....
+*      MEMUNMAPGPIO()
+*      Unmap the memory assigned to GPIO.
 *
 *  Inputs:
+*  		*pMap : starting address of mapping returned by mmap()
+*  		fd	  : memory mapped file descriptor
 *
-*  Outputs:
-*
+*  Outputs:*
 *
 *  Author: Ehsan Shafiei
 *  		   Mar 2017
@@ -130,71 +135,7 @@ void MemUnMapGPIO(void *pMap, int32_T fd)
 	munmap(pMap, MMAP_GPIO_SIZE);
 	close(fd);
 
-} // END: ConfigGPIO()
-
-
-/**
-*  -------------------------------------------------------  *
-*  FUNCTION:
-*      CONFIGGPIO()
-*      configure ....
-*
-*  Inputs:
-*
-*  Outputs:
-*
-*
-*  Author: Ehsan Shafiei
-*  		   Mar 2017
-*  -------------------------------------------------------  *
-*/
-void SetGPIO(volatile uint32_T *mmapAdr, uint16_T gpio)
-{
-	*(mmapAdr + GPIO_SET) |= 1 << gpio;
-
-} // END: ConfigGPIO()
-
-/**
-*  -------------------------------------------------------  *
-*  FUNCTION:
-*      CONFIGGPIO()
-*      configure ....
-*
-*  Inputs:
-*
-*  Outputs:
-*
-*
-*  Author: Ehsan Shafiei
-*  		   Mar 2017
-*  -------------------------------------------------------  *
-*/
-void ClrGPIO(volatile uint32_T *mmapAdr, uint16_T gpio)
-{
-	*(mmapAdr + GPIO_CLR) |= 1 << gpio;
-
-} // END: ConfigGPIO()
-
-/**
-*  -------------------------------------------------------  *
-*  FUNCTION:
-*      CONFIGGPIO()
-*      configure ....
-*
-*  Inputs:
-*
-*  Outputs:
-*
-*
-*  Author: Ehsan Shafiei
-*  		   Mar 2017
-*  -------------------------------------------------------  *
-*/
-boolean_T ReadGPIO(volatile uint32_T *mmapAdr, uint16_T gpio)
-{
-	return (boolean_T) (*(mmapAdr + GPIO_LVL) |= 1 << gpio);
-
-} // END: ConfigGPIO()
+} // END: MemUnMapGPIO()
 
 /*
  * **************************************************

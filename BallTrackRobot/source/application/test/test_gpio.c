@@ -23,18 +23,24 @@
 int main(void)
 {
 	volatile uint32_T *mmapAdr;
-	uint16_T gpio = 21;
+	uint16_T Out1 = GPIO(21), In1 = GPIO(20);
+	boolean_T b = TRUE;
 
 	mmapAdr = MemMapGPIO();
-	ConfigGPIO(mmapAdr, gpio, GPIO_OUT, 0);
+	ConfigGPIO(mmapAdr, Out1, GPIO_OUT, 0);
+	ConfigGPIO(mmapAdr, In1, GPIO_IN , 0);
 
 	while(1)
     {
-		SetGPIO(mmapAdr, gpio);
-		sleep(3);
+		SetGPIO(mmapAdr, Out1);
+		b = ReadGPIO(mmapAdr, In1);
+		printf("Toggle = %d\n", b);
+		sleep(2);
 
-		ClrGPIO(mmapAdr, gpio);
-		sleep(3);
+		ClrGPIO(mmapAdr, Out1);
+		b = ReadGPIO(mmapAdr, In1);
+		printf("Toggle = %d\n", b);
+		sleep(2);
     }
 
     return PASSED;
