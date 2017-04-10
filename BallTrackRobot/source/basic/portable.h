@@ -86,6 +86,8 @@ typedef double 							real64_T;
 #define min(a, b)			(((a) < (b)) ? (a) : (b))
 #define max(a, b)			(((a) > (b)) ? (a) : (b))
 
+#define sat(x, xmin, xmax)	min((xmax), max((xmin), (x)))
+
 #define SETBIT(a, bit)		((a) |=  1 << (bit))
 #define CLRBIT(a, bit)		((a) &= ~(1 << (bit)))
 
@@ -95,6 +97,8 @@ typedef double 							real64_T;
 #define NUM_ELEM(array) 	(sizeof(array) / sizeof(*(array)))
 
 #define RDBIT(a, bit)		(((a) >> (bit)) & 0x01)				// Read bit of a
+
+#define GETSIGN(x)			((x) >= 0 ? 1 : -1)
 
 #endif // _PORTABLE_H_
 

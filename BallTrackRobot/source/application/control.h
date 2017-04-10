@@ -1,25 +1,20 @@
 /*
- * computer_vision.h
+ * control.h
  *
- *  Created on: Feb 3, 2017
+ *  Created on: Apr 3, 2017
  *      Author: ses
  */
 
-#ifndef _COMPUTER_VISION_H_
-#define _COMPUTER_VISION_H_
-
+#ifndef _CONTROL_H_
+#define _CONTROL_H_
 
 /*
  * **************************************************
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
-#include <stdlib.h>
-#include <cv.h>
-#include <highgui.h>
-#include <opencv2/opencv.hpp>
-
-#include <time.h>
+#include <stdio.h>
+#include <math.h>
 
 /*
  * **************************************************
@@ -28,13 +23,15 @@
  */
 #include "portable.h"
 
+
 /*
  * **************************************************
  * DEFINITIONS										*
  * **************************************************
  */
-#define CV_SIZE_W   640
-#define CV_SIZE_H   480
+// Scale to and unscale from [0 factor]
+#define SCALE(  x, xmin, xmax, factor)		((factor) * ((x) - (xmin)) / ((xmax) - (xmin)))
+#define UNSCALE(x, xmin, xmax, factor)		((x) * ((xmax) - (xmin)) / (factor) + (xmin))
 
 
 /*
@@ -50,24 +47,19 @@
  * TYPE DEFINITIONS									*
  * **************************************************
  */
-// HSV filter
-enum
-{
-	H_MIN,
-	H_MAX,
-	S_MIN,
-	S_MAX,
-	V_MIN,
-	V_MAX,
-	HSV_LEN
-};
-
-// Ball location
+// PID gains for ideal form implementation
 typedef struct
 {
-    int32_T x;
-    int32_T y;
-} ballLoc_T;
+	real32_T k ;		// PID gain
+	real32_T ti;		// integration time
+	real32_T td;		// derivative time
+	uint16_T n ;		// derivative filter factor
+	real32_T I ; 		// integrator state updated inside PIDCtl()
+	real32_T D ;		// derivative state updated inside PIDCtl()
+	uint16_T y ;		// previous output  updated inside PIDCtl()
+	uint16_T scale;		// normalizing scale factor
+} pid_T;
+
 
 /*
  * **************************************************
@@ -83,13 +75,8 @@ typedef struct
  * PROTOTYPES										*
  * **************************************************
  */
-void TuneBallFilt(IplImage *img, int32_T x, int32_T y);
+uint16_T PIDCtl(pid_T *pid, uint16_T r, uint16_T y, real32_T ts);
 
-IplImage *FiltBall(IplImage *img);
+#endif // _CONTROL_H_
 
-boolean_T FindBall(IplImage *img, ballLoc_T *loc);
-
-#endif // _COMPUTER_VISION_H_
-
-// EOF: computer_vision.h
-
+// EOF: servo_motor.h

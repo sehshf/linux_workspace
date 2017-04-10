@@ -37,24 +37,20 @@ int main(void)
 	cvNamedWindow("piWindow", CV_WINDOW_AUTOSIZE);
 	cvMoveWindow ("piWindow", 400, 200);
 
-
-	IplImage *img;
-	IplImage *imgFild = cvCreateImage(CvSize(CV_SIZE_W, CV_SIZE_H), IPL_DEPTH_8U, 1);
+	IplImage *img, *imgFild;
 
 	while(1)
 	{
 		img = cvQueryFrame(capture);
 
-		cvCopy(img, imgFild, NULL);
-
-		FiltBall(imgFild);
+		imgFild = FiltBall(img);
 
 		dtcdFlag = FindBall(imgFild, &loc);
 
 		if (dtcdFlag)
 			cvCircle(img, CvPoint(loc.x, loc.y), 5, CV_RGB(255, 0, 0));
 
-		cvShowImage("piWindow" , img );
+		cvShowImage("piWindow" , img);
 
 		// wait for a key
 		cvWaitKey(30);

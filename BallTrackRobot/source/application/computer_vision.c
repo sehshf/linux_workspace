@@ -26,8 +26,11 @@
  * FILE SCOPE VARIABLES (static)					*
  * **************************************************
  */
+// Minimum and maximum object area for the ball
+static const int32_T AREA_MIN = 60 * 60;
+static const int32_T AREA_MAX = 350 * 350;
 
-
+static const int32_T HSV_ARR[HSV_LEN] = {22, 50, 20, 255, 50, 255};
 
 /*
  * **************************************************
@@ -117,30 +120,22 @@ void TuneBallFilt(IplImage *img, int32_T x, int32_T y)
 *          Feb 2017
 *  -------------------------------------------------------  *
 */
-void FiltBall(IplImage *img)
+IplImage *FiltBall(IplImage *img)
 {
-    static const int32_T hsvArr[HSV_LEN + 1] = {30, 64, 86, 255, 34, 255};
-
-    IplConvKernel *erodeElement, *dilateElement;
-
-    erodeElement  = cvCreateStructuringElementEx(3, 3, 0, 0, CV_SHAPE_RECT);;
-    dilateElement = cvCreateStructuringElementEx(8, 8, 0, 0, CV_SHAPE_RECT);
+	static IplImage *imgTmp  = cvCreateImage(CvSize(CV_SIZE_W, CV_SIZE_H), IPL_DEPTH_8U, 3);
+    static IplImage *imgFild = cvCreateImage(CvSize(CV_SIZE_W, CV_SIZE_H), IPL_DEPTH_8U, 1);
 
     // Covert image color to HSV color space
-    cvCvtColor(img, img, CV_BGR2HSV);
+    cvCvtColor(img, imgTmp, CV_BGR2HSV);
 
     // Filter the image within the HSV range
-    cvInRangeS(img, cvScalar(hsvArr[H_MIN], hsvArr[S_MIN], hsvArr[V_MIN]),
-                        cvScalar(hsvArr[H_MAX], hsvArr[S_MAX], hsvArr[V_MAX]), img);
+    cvInRangeS( imgTmp,
+    			cvScalar(HSV_ARR[H_MIN], HSV_ARR[S_MIN], HSV_ARR[V_MIN]),
+                cvScalar(HSV_ARR[H_MAX], HSV_ARR[S_MAX], HSV_ARR[V_MAX]),
+				imgFild
+			  );
 
-    // Erode image to filter out the noises aounrd it
-    cvErode (img, img, erodeElement , 2);
-
-    // Dilate the eroded image
-    cvDilate(img, img, dilateElement, 2);
-
-//    cvReleaseStructuringElement(&erodeElement );
-//    cvReleaseStructuringElement(&dilateElement);
+    return imgFild;
 
 } // END: FiltBall()
 
@@ -165,11 +160,7 @@ void FiltBall(IplImage *img)
 */
 boolean_T FindBall(IplImage *img, ballLoc_T *loc)
 {
-    // Minimum and maximum object area for the ball
-    static const int32_T AREA_MIN = 20 * 20;
-    static const int32_T AREA_MAX = CV_SIZE_W * CV_SIZE_H * 3 / 4;
-
-    static IplImage* imgTmp = cvCreateImage(CvSize(CV_SIZE_W, CV_SIZE_H), IPL_DEPTH_8U, 3);
+    static IplImage* imgTmp = cvCreateImage(CvSize(CV_SIZE_W, CV_SIZE_H), IPL_DEPTH_8U, 1);
 
     static int32_T         numCont;                             // number of contours
     static CvMemStorage    *storage = cvCreateMemStorage(0);    // storage block for contours
@@ -200,10 +191,6 @@ boolean_T FindBall(IplImage *img, ballLoc_T *loc)
 
                 lastArea  = area;
                 find = TRUE;
-            }
-            else
-            {
-                find = FALSE;
             }
         }
     }

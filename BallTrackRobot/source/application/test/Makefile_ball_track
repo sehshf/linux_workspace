@@ -23,7 +23,7 @@ LIBS = -lm -lpthread -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_im
 #LIBS = -lmylib -lm
 
 # Output executable file
-OUTPUTFILE = TestBallTrack
+OUTPUTFILE = TestBallTrack.elf
 
 # Path
 HOME			= /home/ses

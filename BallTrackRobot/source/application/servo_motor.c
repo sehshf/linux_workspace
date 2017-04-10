@@ -61,7 +61,7 @@ void InitServos(void)
 	SetupPCABoard();
 	SetPCAFreq(50);		// 50 Hz
 	DriveServoAbs(PAN_MOTOR , 0);
-	DriveServoAbs(TILT_MOTOR, 0);
+	DriveServoAbs(TILT_MOTOR, -45);
 
 } // END: InitServos()
 

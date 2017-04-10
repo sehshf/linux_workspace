@@ -23,7 +23,7 @@ LIBS = -lm -lpthread
 #LIBS = -lmylib -lm
 
 # Output executable file
-OUTPUTFILE = TestServo
+OUTPUTFILE = TestServo.elf
 
 # Path
 PROJECT 	= /home/ses/workspace/BallTrackRobot

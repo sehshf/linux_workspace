@@ -35,8 +35,9 @@
 
 
 #define SERVO_POS_MAX		90
+#define SERVO_POS_MIN	   -90
 #define SERVO_CCW			1		// Positive direction
-#define SERVO_CW			-1		// Negative direction
+#define SERVO_CW		   -1		// Negative direction
 
 // PWM channels where motors are connected to
 #define PAN_MOTOR			0
