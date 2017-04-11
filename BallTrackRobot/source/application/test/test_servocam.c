@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include "../motor.h"
 /*
  * **************************************************
  * APPLICATION INCLUDE FILES						*
@@ -23,7 +24,6 @@
  */
 #include "portable.h"
 #include "computer_vision.h"
-#include "servo_motor.h"
 #include "control.h"
 
 
@@ -45,6 +45,8 @@ int main(int argc, char *argv[])
 	usleep(50000);
 
 	InitServos();
+	DriveServoAbs(PAN_MOTOR ,   0);
+	DriveServoAbs(TILT_MOTOR, -45);
 
 	printf("Start video capturing\n");
 	CvCapture *capture =  cvCreateCameraCapture(0);

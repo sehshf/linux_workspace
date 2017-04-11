@@ -114,8 +114,8 @@ void SetPCAFreq(uint16_T freq)
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      SETPCAPWM()
-*      Specify the PWM signal with starting delay and duty cycle.
+*      SETPCAPULSE()
+*      Specify the pulse with starting delay and pulse width.
 *
 *  Inputs:
 *      channel 	: The PWM channel on PCA9685
@@ -127,7 +127,7 @@ void SetPCAFreq(uint16_T freq)
 *  		   Aug 2016
 *  -------------------------------------------------------  *
 */
-void SetPCAPWM(uint8_T channel, uint16_T pulse)
+void SetPCAPulse(uint8_T channel, uint16_T pulse)
 {
 	uint16_T onCnt, offCnt;
 
@@ -139,8 +139,38 @@ void SetPCAPWM(uint8_T channel, uint16_T pulse)
 	SMBusWrite8(fd, LED0_OFF_L + 4 * channel, BYTE_L(offCnt));
 	SMBusWrite8(fd, LED0_OFF_H + 4 * channel, BYTE_H(offCnt));
 
-} // END: SetPCAPWM()
+} // END: SetPCAPulse()
 
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      SETPCAPWM()
+*      Specify the PWM signal with duty cycle in percent.
+*
+*  Inputs:
+*      channel 	: The PWM channel on PCA9685
+*      duty		: Duty cycle [%]
+*
+*  Outputs:
+*
+*  Author: Ehsan Shafiei
+*  		   Apr 2017
+*  -------------------------------------------------------  *
+*/
+void SetPCAPWM(uint8_T channel, uint8_T duty)
+{
+	uint16_T onCnt, offCnt;
+
+	onCnt  = 0;
+	offCnt = onCnt + (PCA9685_COUNT - 1) * duty / 100;
+
+	SMBusWrite8(fd, LED0_ON_L  + 4 * channel, BYTE_L(onCnt ));
+	SMBusWrite8(fd, LED0_ON_H  + 4 * channel, BYTE_H(onCnt ));
+	SMBusWrite8(fd, LED0_OFF_L + 4 * channel, BYTE_L(offCnt));
+	SMBusWrite8(fd, LED0_OFF_H + 4 * channel, BYTE_H(offCnt));
+
+} // END: SetPCAPWM()
 
 /*
  * **************************************************

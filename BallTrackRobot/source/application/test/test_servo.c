@@ -12,13 +12,13 @@
  */
 #include <stdio.h>
 
+#include "motor.h"
 /*
  * **************************************************
  * APPLICATION INCLUDE FILES						*
  * **************************************************
  */
 #include "portable.h"
-#include "servo_motor.h"
 
 int main(void)
 {
@@ -27,6 +27,8 @@ int main(void)
 	int16_T direction;
 
 	InitServos();
+	DriveServoAbs(PAN_MOTOR , 0);
+	DriveServoAbs(TILT_MOTOR, 0);
 
 	while(1)
     {

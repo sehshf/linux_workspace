@@ -10,7 +10,7 @@
  * APPLICATION INCLUDE FILES						*
  * **************************************************
  */
-#include "servo_motor.h"
+#include "motor.h"
 
 /*
  * **************************************************
@@ -25,7 +25,7 @@
  * FILE SCOPE VARIABLES (static)					*
  * **************************************************
  */
-static int8_T 	servoPos[NUM_MOTORS];	// Can vary from -90 to 90
+static int8_T 	servoPos[NUM_SERVOS];	// Can vary from -90 to 90
 
 
 /*
@@ -41,12 +41,11 @@ static int8_T 	servoPos[NUM_MOTORS];	// Can vary from -90 to 90
  * PUBLIC FUNCTIONS									*
  * **************************************************
  */
-
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      INITSERVOS()
-*      Initializing the servo motors.
+*      INITMOTORS()
+*      Initializing the PCA board to drive the motors.
 *
 *  Inputs:
 *
@@ -56,14 +55,12 @@ static int8_T 	servoPos[NUM_MOTORS];	// Can vary from -90 to 90
 *  		   Oct 2016
 *  -------------------------------------------------------  *
 */
-void InitServos(void)
+void InitMotors(void)
 {
 	SetupPCABoard();
 	SetPCAFreq(50);		// 50 Hz
-	DriveServoAbs(PAN_MOTOR , 0);
-	DriveServoAbs(TILT_MOTOR, -45);
 
-} // END: InitServos()
+} // END: InitMotors()
 
 
 /**
@@ -90,7 +87,7 @@ void DriveServoAbs(uint8_T motor, int8_T degree)
 
 	servoPos[motor] = degree;		// Update position
 
-	SetPCAPWM(motor, pulse);
+	SetPCAPulse(motor, pulse);
 
 } // END: DriveServoAbs()
 
@@ -141,6 +138,50 @@ int8_T GetServoPos(uint8_T motor)
 	return servoPos[motor];
 
 } // END: GetServoPos()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      DRIVEMOTOR()
+*      Return the absolute position of the specified servo motor.
+*
+*  Inputs:
+*      motor    : Specifies the DC motor.
+*      direction: Rotation direction
+*      speed	: Motor speed [0 100]
+*
+*  Outputs:
+*      servoPos : Position.
+*
+*  Author: Ehsan Shafiei
+*  		   Apr 2017
+*  -------------------------------------------------------  *
+*/
+void DriveMotor(motor_T *motor, int8_T direction, uint8_T speed)
+{
+	if (direction != motor->direction)
+	{
+		if (direction > 0)
+			SetPCAPWM(motor->id + 1, 0);
+		else
+			SetPCAPWM(motor->id, 0);
+		motor->speed = 0;
+	}
+
+	// If there is no speed encoder, this ensures the motor run
+	if (speed > 0)
+		speed = max(speed, 15);
+
+	if (direction > 0)
+		SetPCAPWM(motor->id, speed);
+	else
+		SetPCAPWM(motor->id + 1, speed);
+
+	motor->direction = direction;
+	motor->speed = speed;
+
+} // END: DriveMotor()
 
 
 /*

@@ -89,7 +89,9 @@ void SetupPCABoard(void);
 
 void SetPCAFreq(uint16_T freq);
 
-void SetPCAPWM(uint8_T channel, uint16_T pulse);
+void SetPCAPulse(uint8_T channel, uint16_T pulse);
+
+void SetPCAPWM(uint8_T channel, uint8_T duty);
 
 
 #endif // _PCA9685_H_

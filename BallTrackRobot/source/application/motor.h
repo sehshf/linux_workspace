@@ -36,13 +36,17 @@
 
 #define SERVO_POS_MAX		90
 #define SERVO_POS_MIN	   -90
-#define SERVO_CCW			1		// Positive direction
-#define SERVO_CW		   -1		// Negative direction
+#define NUM_SERVOS 			2
 
-// PWM channels where motors are connected to
-#define PAN_MOTOR			0
-#define TILT_MOTOR			1
-#define NUM_MOTORS			2
+#define MOTOR_CCW			1
+#define MOTOR_CW		   -1
+
+#define PAN_MOTOR 			0
+#define TILT_MOTOR 			1
+#define LEFT_MOTOR			2
+// number 3 is reserved for LEFT_MOTOR direction
+#define RIGHT_MOTOR 		4
+// number 5 is reserved for RIGHT_MOTOR direction
 
 
 /*
@@ -58,7 +62,12 @@
  * TYPE DEFINITIONS									*
  * **************************************************
  */
-
+typedef struct
+{
+	uint8_T id;
+	int8_T  direction;
+	uint8_T speed;
+} motor_T;
 
 
 /*
@@ -75,7 +84,7 @@
  * PROTOTYPES										*
  * **************************************************
  */
-void InitServos(void);
+void InitMotors(void);
 
 void DriveServoAbs(uint8_T motor, int8_T degree);
 
@@ -83,6 +92,7 @@ void DriveServoInc(uint8_T motor, int8_T direction, int8_T degree);
 
 int8_T GetServoPos(uint8_T motor);
 
+void DriveMotor(motor_T *motor, int8_T direction, uint8_T speed);
 
 #endif // _SERVO_MOTOR_H_
 
