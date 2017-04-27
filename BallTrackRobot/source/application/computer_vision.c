@@ -18,7 +18,7 @@
  * GLOBAL VARIABLES (extern)						*
  * **************************************************
  */
-
+CvCapture *capture;
 
 
 /*
@@ -30,7 +30,6 @@
 static const int32_T AREA_MIN = 60 * 60;
 static const int32_T AREA_MAX = 350 * 350;
 
-static const int32_T HSV_ARR[HSV_LEN] = {22, 50, 20, 255, 50, 255};
 
 /*
  * **************************************************
@@ -45,6 +44,51 @@ static const int32_T HSV_ARR[HSV_LEN] = {22, 50, 20, 255, 50, 255};
  * PUBLIC FUNCTIONS									*
  * **************************************************
  */
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      INITCAMERA()
+*      Initializing the camera.
+*
+*  Inputs:
+*
+*  Outputs:
+*
+*  Author: Ehsan Shafiei
+*  		   Apr 2017
+*  -------------------------------------------------------  *
+*/
+void InitCamera(void)
+{
+	system("sudo modprobe bcm2835-v4l2");
+	usleep(50000);
+
+	printf("Start video capturing\n");
+	capture =  cvCreateCameraCapture(0);
+
+} // END: InitCamera()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      EXITCAMERA()
+*      Release camera capture.
+*
+*  Inputs:
+*
+*  Outputs:
+*
+*  Author: Ehsan Shafiei
+*  		   Apr 2017
+*  -------------------------------------------------------  *
+*/
+void ExitCamera(void)
+{
+	cvReleaseCapture(&capture);
+
+} // END: ExitCamera()
+
 
 /**
 *  -------------------------------------------------------  *
@@ -67,7 +111,7 @@ void TuneBallFilt(IplImage *img, int32_T x, int32_T y)
 {
 	static IplImage *imgTmp = cvCreateImage(CvSize(CV_SIZE_W, CV_SIZE_H), IPL_DEPTH_8U, 3);
 
-	static int32_T hsvArr[HSV_LEN + 1] = {30, 64, 86, 255, 34, 255};
+	static int32_T hsvArr[] = {30, 64, 86, 255, 34, 255};
 
 	// Create image window
 	cvNamedWindow("imgWindow", CV_WINDOW_AUTOSIZE);
@@ -130,8 +174,8 @@ IplImage *FiltBall(IplImage *img)
 
     // Filter the image within the HSV range
     cvInRangeS( imgTmp,
-    			cvScalar(HSV_ARR[H_MIN], HSV_ARR[S_MIN], HSV_ARR[V_MIN]),
-                cvScalar(HSV_ARR[H_MAX], HSV_ARR[S_MAX], HSV_ARR[V_MAX]),
+    			cvScalar(CAMERA_C.hsv[H_MIN], CAMERA_C.hsv[S_MIN], CAMERA_C.hsv[V_MIN]),
+                cvScalar(CAMERA_C.hsv[H_MAX], CAMERA_C.hsv[S_MAX], CAMERA_C.hsv[V_MAX]),
 				imgFild
 			  );
 

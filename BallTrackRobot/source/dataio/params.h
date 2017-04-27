@@ -1,26 +1,19 @@
 /*
- * computer_vision.h
+ * params.h
  *
- *  Created on: Feb 3, 2017
+ *  Created on: Apr 27, 2017
  *      Author: ses
  */
 
-#ifndef _COMPUTER_VISION_H_
-#define _COMPUTER_VISION_H_
-
+#ifndef _PARAMS_H_
+#define _PARAMS_H_
 
 /*
  * **************************************************
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
-#include <stdlib.h>
-#include <unistd.h>
-#include <cv.h>
-#include <highgui.h>
-#include <opencv2/opencv.hpp>
 
-#include <time.h>
 
 /*
  * **************************************************
@@ -28,15 +21,14 @@
  * **************************************************
  */
 #include "portable.h"
-#include "params.h"
+
 
 /*
  * **************************************************
  * DEFINITIONS										*
  * **************************************************
  */
-#define CV_SIZE_W   640
-#define CV_SIZE_H   480
+
 
 
 /*
@@ -52,48 +44,32 @@
  * TYPE DEFINITIONS									*
  * **************************************************
  */
-// HSV filter
-enum
-{
-	H_MIN,
-	H_MAX,
-	S_MIN,
-	S_MAX,
-	V_MIN,
-	V_MAX,
-};
 
-// Ball location
-typedef struct
-{
-    int32_T x;
-    int32_T y;
-} ballLoc_T;
+
 
 /*
  * **************************************************
  * External VARIABLES       						*
  * **************************************************
  */
-extern CvCapture *capture;
+// "motors" component calibration parameters
+struct MOTORS_TAG
+{
+	real32_T Kpan ;
+	real32_T Ktilt;
+};
+
+extern struct MOTORS_TAG MOTORS_C;
 
 
+// "camera" component calibration parameters
+struct CAMERA_TAG
+{
+	int32_T hsv[6];
+};
 
-/*
- * **************************************************
- * PROTOTYPES										*
- * **************************************************
- */
-void InitCamera(void);
-void ExitCamera(void);
+extern struct CAMERA_TAG CAMERA_C;
 
-void TuneBallFilt(IplImage *img, int32_T x, int32_T y);
+#endif // _PARAMS_H_
 
-IplImage *FiltBall(IplImage *img);
-
-boolean_T FindBall(IplImage *img, ballLoc_T *loc);
-
-#endif // _COMPUTER_VISION_H_
-
-// EOF: computer_vision.h
-
+// EOF: params.h

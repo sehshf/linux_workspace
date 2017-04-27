@@ -1,42 +1,52 @@
 /*
- * computer_vision.h
+ * motor_drive.h
  *
- *  Created on: Feb 3, 2017
+ *  Created on: 22/10/2016
  *      Author: ses
  */
 
-#ifndef _COMPUTER_VISION_H_
-#define _COMPUTER_VISION_H_
-
+#ifndef _MOTORS_DRIVE_H_
+#define _MOTORS_DRIVE_H_
 
 /*
  * **************************************************
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
-#include <stdlib.h>
-#include <unistd.h>
-#include <cv.h>
-#include <highgui.h>
-#include <opencv2/opencv.hpp>
 
-#include <time.h>
 
 /*
  * **************************************************
  * APPLICATION INCLUDE FILES						*
  * **************************************************
  */
-#include "portable.h"
-#include "params.h"
+#include "pca9685.h"
+
 
 /*
  * **************************************************
  * DEFINITIONS										*
  * **************************************************
  */
-#define CV_SIZE_W   640
-#define CV_SIZE_H   480
+// Pulse defines in ms
+#define SERVO_PULSE_NEUT	1500
+#define SERVO_PULSE_MIN		600
+#define SERVO_PULSE_MAX		2400
+
+
+#define SERVO_POS_MAX		90
+#define SERVO_POS_MIN	   -90
+#define NUM_SERVOS 			2
+
+#define MOTOR_CCW			1
+#define MOTOR_CW		   -1
+
+#define PAN_MOTOR 			0
+#define TILT_MOTOR 			1
+#define LEFT_MOTOR			2
+// number 3 is reserved for LEFT_MOTOR direction
+#define RIGHT_MOTOR 		4
+// number 5 is reserved for RIGHT_MOTOR direction
 
 
 /*
@@ -52,30 +62,20 @@
  * TYPE DEFINITIONS									*
  * **************************************************
  */
-// HSV filter
-enum
-{
-	H_MIN,
-	H_MAX,
-	S_MIN,
-	S_MAX,
-	V_MIN,
-	V_MAX,
-};
-
-// Ball location
 typedef struct
 {
-    int32_T x;
-    int32_T y;
-} ballLoc_T;
+	uint8_T id;
+	int8_T  direction;
+	uint8_T speed;
+} motor_T;
+
 
 /*
  * **************************************************
  * External VARIABLES       						*
  * **************************************************
  */
-extern CvCapture *capture;
+
 
 
 
@@ -84,16 +84,16 @@ extern CvCapture *capture;
  * PROTOTYPES										*
  * **************************************************
  */
-void InitCamera(void);
-void ExitCamera(void);
+void InitMotors(void);
 
-void TuneBallFilt(IplImage *img, int32_T x, int32_T y);
+void DriveServoAbs(uint8_T motor, int8_T degree);
 
-IplImage *FiltBall(IplImage *img);
+void DriveServoInc(uint8_T motor, int8_T direction, int8_T degree);
 
-boolean_T FindBall(IplImage *img, ballLoc_T *loc);
+int8_T GetServoPos(uint8_T motor);
 
-#endif // _COMPUTER_VISION_H_
+void DriveMotor(motor_T *motor, int8_T direction, uint8_T speed);
 
-// EOF: computer_vision.h
+#endif // _SERVO_MOTOR_H_
 
+// EOF: motor_drive.h

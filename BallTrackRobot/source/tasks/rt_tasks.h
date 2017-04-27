@@ -1,53 +1,48 @@
 /*
- * servo_motor.h
+ * tasks.h
  *
- *  Created on: 22/10/2016
+ *  Created on: 27/08/2016
  *      Author: ses
  */
 
-#ifndef _SERVO_MOTOR_H_
-#define _SERVO_MOTOR_H_
+#ifndef _RT_TASKS_H_
+#define _RT_TASKS_H_
 
 /*
  * **************************************************
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
-
+#include <pthread.h>
+#include <semaphore.h>
+#include <stdio.h>
+#include <time.h>
+#include <unistd.h>
 
 /*
  * **************************************************
  * APPLICATION INCLUDE FILES						*
  * **************************************************
  */
-#include "pca9685.h"
-
+#include "portable.h"
+#include "camera.h"
+#include "motors.h"
 
 /*
  * **************************************************
  * DEFINITIONS										*
  * **************************************************
  */
-// Pulse defines in ms
-#define SERVO_PULSE_NEUT	1500
-#define SERVO_PULSE_MIN		600
-#define SERVO_PULSE_MAX		2400
+#define NUM_TASKS 	2
+#define MAX_PRIO	(sched_get_priority_min(SCHED_FIFO) + NUM_TASKS)
 
+// Tasks enum should be ordered based on the tasks priorities
+enum
+{
+	CAMERA_TASK,
+	MOTORS_TASK
 
-#define SERVO_POS_MAX		90
-#define SERVO_POS_MIN	   -90
-#define NUM_SERVOS 			2
-
-#define MOTOR_CCW			1
-#define MOTOR_CW		   -1
-
-#define PAN_MOTOR 			0
-#define TILT_MOTOR 			1
-#define LEFT_MOTOR			2
-// number 3 is reserved for LEFT_MOTOR direction
-#define RIGHT_MOTOR 		4
-// number 5 is reserved for RIGHT_MOTOR direction
-
+};
 
 /*
  * **************************************************
@@ -64,19 +59,25 @@
  */
 typedef struct
 {
-	uint8_T id;
-	int8_T  direction;
-	uint8_T speed;
-} motor_T;
+	uint32_T clockTickL;
+	uint32_T clockTickH;
+} timing_T;
 
+typedef struct
+{
+	sem_t 	  		sem;
+	pthread_t 		thread;
+	uint16_T  		period;	// Coefficient of the base period.
+	pthread_mutex_t *mutex;
+} task_T;
 
 /*
  * **************************************************
  * External VARIABLES       						*
  * **************************************************
  */
-
-
+extern task_T 	 task[NUM_TASKS];
+extern real32_T  baseTs;
 
 
 /*
@@ -84,16 +85,21 @@ typedef struct
  * PROTOTYPES										*
  * **************************************************
  */
-void InitMotors(void);
+void InitRTTasks(uint16_T period[NUM_TASKS]);
 
-void DriveServoAbs(uint8_T motor, int8_T degree);
+pf_T CreateRTTask(task_T task,
+				  pthread_attr_t attr,
+				  int16_T prio,
+				  struct sched_param schedParam,
+				  uint16_T period,
+				  void *(*TaskRoutine) (void *),
+				  void *threadArg
+				 );
 
-void DriveServoInc(uint8_T motor, int8_T direction, int8_T degree);
+void *BaseRate(void *arg);
 
-int8_T GetServoPos(uint8_T motor);
+void *TaskRoutine(void *arg);
 
-void DriveMotor(motor_T *motor, int8_T direction, uint8_T speed);
+#endif // _RT_TASKS_H_
 
-#endif // _SERVO_MOTOR_H_
-
-// EOF: servo_motor.h
+// EOF: rt_tasks.h

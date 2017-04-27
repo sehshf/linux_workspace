@@ -1,26 +1,20 @@
 /*
- * computer_vision.h
+ * camera.h
  *
- *  Created on: Feb 3, 2017
+ *  Created on: 26/04/2017
  *      Author: ses
  */
 
-#ifndef _COMPUTER_VISION_H_
-#define _COMPUTER_VISION_H_
 
+#ifndef _CAMERA_H_
+#define _CAMERA_H_
 
 /*
  * **************************************************
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
-#include <stdlib.h>
-#include <unistd.h>
-#include <cv.h>
-#include <highgui.h>
-#include <opencv2/opencv.hpp>
 
-#include <time.h>
 
 /*
  * **************************************************
@@ -28,15 +22,15 @@
  * **************************************************
  */
 #include "portable.h"
-#include "params.h"
+#include "rt_tasks.h"
+#include "computer_vision.h"
 
 /*
  * **************************************************
  * DEFINITIONS										*
  * **************************************************
  */
-#define CV_SIZE_W   640
-#define CV_SIZE_H   480
+
 
 
 /*
@@ -52,30 +46,18 @@
  * TYPE DEFINITIONS									*
  * **************************************************
  */
-// HSV filter
-enum
-{
-	H_MIN,
-	H_MAX,
-	S_MIN,
-	S_MAX,
-	V_MIN,
-	V_MAX,
-};
-
-// Ball location
 typedef struct
 {
-    int32_T x;
-    int32_T y;
-} ballLoc_T;
+	ballLoc_T ballLoc;
+} cameraOutputs_T;
+
 
 /*
  * **************************************************
  * External VARIABLES       						*
  * **************************************************
  */
-extern CvCapture *capture;
+extern cameraOutputs_T cameraOutputs;
 
 
 
@@ -84,16 +66,10 @@ extern CvCapture *capture;
  * PROTOTYPES										*
  * **************************************************
  */
-void InitCamera(void);
-void ExitCamera(void);
+void RunCamera(uint16_T period);
 
-void TuneBallFilt(IplImage *img, int32_T x, int32_T y);
 
-IplImage *FiltBall(IplImage *img);
+#endif // _CAMERA_H_
 
-boolean_T FindBall(IplImage *img, ballLoc_T *loc);
-
-#endif // _COMPUTER_VISION_H_
-
-// EOF: computer_vision.h
+// EOF: camera.h
 

@@ -1,26 +1,20 @@
 /*
- * computer_vision.h
+ * motors.h
  *
- *  Created on: Feb 3, 2017
+ *  Created on: 26/04/2017
  *      Author: ses
  */
 
-#ifndef _COMPUTER_VISION_H_
-#define _COMPUTER_VISION_H_
 
+#ifndef _MOTORS_H_
+#define _MOTORS_H_
 
 /*
  * **************************************************
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
-#include <stdlib.h>
-#include <unistd.h>
-#include <cv.h>
-#include <highgui.h>
-#include <opencv2/opencv.hpp>
 
-#include <time.h>
 
 /*
  * **************************************************
@@ -28,6 +22,9 @@
  * **************************************************
  */
 #include "portable.h"
+#include "rt_tasks.h"
+#include "motor_drive.h"
+#include "computer_vision.h"
 #include "params.h"
 
 /*
@@ -35,8 +32,10 @@
  * DEFINITIONS										*
  * **************************************************
  */
-#define CV_SIZE_W   640
-#define CV_SIZE_H   480
+typedef struct
+{
+	ballLoc_T ballLoc;
+} motorsInputs_T;
 
 
 /*
@@ -52,30 +51,15 @@
  * TYPE DEFINITIONS									*
  * **************************************************
  */
-// HSV filter
-enum
-{
-	H_MIN,
-	H_MAX,
-	S_MIN,
-	S_MAX,
-	V_MIN,
-	V_MAX,
-};
 
-// Ball location
-typedef struct
-{
-    int32_T x;
-    int32_T y;
-} ballLoc_T;
+
 
 /*
  * **************************************************
  * External VARIABLES       						*
  * **************************************************
  */
-extern CvCapture *capture;
+
 
 
 
@@ -84,16 +68,10 @@ extern CvCapture *capture;
  * PROTOTYPES										*
  * **************************************************
  */
-void InitCamera(void);
-void ExitCamera(void);
+void RunMotors(uint16_T period);
 
-void TuneBallFilt(IplImage *img, int32_T x, int32_T y);
 
-IplImage *FiltBall(IplImage *img);
+#endif // _MOTOR_H_
 
-boolean_T FindBall(IplImage *img, ballLoc_T *loc);
-
-#endif // _COMPUTER_VISION_H_
-
-// EOF: computer_vision.h
+// EOF: motors.h
 

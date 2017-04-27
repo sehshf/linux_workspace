@@ -6,53 +6,68 @@
 #
 
 # define the C compiler to use
-CC = arm-linux-gnueabihf-gcc
+CC = arm-linux-gnueabihf-g++
 
 # define any compile-time flags
-CFLAGS = -g -Wall
+CFLAGS = -g -Wall -std=gnu++11
 
 # define library paths in addition to /usr/lib
 #   if I wanted to include libraries not in /usr/lib I'd specify
 #   their path using -Lpath, something like:
-#LFLAGS = -L/home/newhall/lib  -L../lib
+LFLAGS = -L/home/ses/opencv-3.2.0/build/install/lib
 
 # define any libraries to link into executable:
 #   if I want to link in libraries (libx.so or libx.a) I use the -llibname 
 #   option, something like (this will link in libmylib.so and libm.so:
-LIBS = -lm -lpthread
+LIBS = -lm -lpthread -lrt -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lopencv_objdetect -ldl
 #LIBS = -lmylib -lm
 
 # Output executable file
-OUTPUTFILE = MultiTask
+OUTPUTFILE = BallTrackRobot.elf
 
 # Path
-RELEASEDIR  = release
-EXEDIR      = $(RELEASEDIR)/exe
-OBJDIR      = $(RELEASEDIR)/obj
-DRIVER		= source/driver
-BASIC		= source/basic
-APPLICATION = source/application
+HOME			= /home/ses
+PROJECT 		= $(HOME)/workspace/BallTrackRobot
+SOURCE 			= $(PROJECT)/source
+RELEASEDIR 		= $(PROJECT)/release
+BASIC			= $(SOURCE)/basic
+APPLICATION 	= $(SOURCE)/application
+TASKS 			= $(SOURCE)/tasks
+DATAIO 			= $(SOURCE)/dataio
+EXEDIR      	= $(RELEASEDIR)/exe
+OBJDIR      	= $(RELEASEDIR)/obj
+OPENCVINCLUDE 	= $(HOME)/opencv-3.2.0/build/install/include
+OPENCV 			= $(OPENCVINCLUDE)/opencv
 
 # define any directories containing header files other than /usr/include
-#
-INCLUDES =  	 \
--I$(DRIVER) 	 \
--I$(BASIC)		 \
--I$(APPLICATION)
+INCLUDES = 			\
+-I$(APPLICATION)	\
+-I$(BASIC)			\
+-I$(DATAIO)			\
+-I$(OPENCVINCLUDE) 	\
+-I$(OPENCV)			\
+-I$(TASKS)			
 
 # Specify all paths of source files
-VPATH = $(DRIVER) : $(BASIC) : $(APPLICATION)
+VPATH = $(BASIC) : $(APPLICATION) : $(TASKS) : $(DATAIO)
 
 # define the C source files
 # Extract source directories
 SRC_DIRS = $(subst :, ,$(VPATH))
 
-SRCS =  		\
-main.c			\
-rt_tasks.c		\
-task1.c 		\
-task2.c 		\
-task3.c	
+SRCS = 				\
+camera.c 			\
+common.c 			\
+computer_vision.c	\
+control.c			\
+i2c_smbus.c			\
+gpio.c 				\
+main.c				\
+motor_drive.c       \
+motors.c			\
+params.c			\
+pca9685.c			\
+rt_tasks.c
 
 # define the C object files 
 #
@@ -80,8 +95,8 @@ all: $(MAIN)
 
 $(MAIN): $(OBJS) 
 	@echo "--- Linking ..."
-	$(CC) $(CFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LIBS)
-#$(CC) $(CFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
+	$(CC) $(CFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LFLAGS) $(LIBS)
+#$(CC) $(CFLAGS) $(INCLUDES) -o $(MAIN) $(OBJS) $(LIBS)
 
 # this is a suffix replacement rule for building .o's from .c's
 # it uses automatic variables $<: the name of the prerequisite of

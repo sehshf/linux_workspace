@@ -16,12 +16,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "../motor.h"
-/*
- * **************************************************
- * APPLICATION INCLUDE FILES						*
- * **************************************************
- */
+#include "motor_drive.h"
 #include "portable.h"
 #include "computer_vision.h"
 #include "control.h"
@@ -41,15 +36,11 @@ int main(int argc, char *argv[])
 	clock_t tic, toc;
 	real32_T dt;
 
-	system("sudo modprobe bcm2835-v4l2");
-	usleep(50000);
-
 	InitServos();
 	DriveServoAbs(PAN_MOTOR ,   0);
 	DriveServoAbs(TILT_MOTOR, -45);
 
-	printf("Start video capturing\n");
-	CvCapture *capture =  cvCreateCameraCapture(0);
+	InitCamera();
 
 	while(1)
 	{
@@ -86,7 +77,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	cvReleaseCapture(&capture);
+	ExitCamera();
 
 	return PASSED;
 

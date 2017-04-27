@@ -15,13 +15,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-/*
- * **************************************************
- * APPLICATION INCLUDE FILES						*
- * **************************************************
- */
+#include "../motor_drive.h"
 #include "portable.h"
-#include "motor.h"
 
 
 

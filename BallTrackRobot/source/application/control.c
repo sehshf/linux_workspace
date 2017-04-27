@@ -101,11 +101,11 @@ uint16_T PIDCtl(pid_T *pid, uint16_T r, uint16_T y, real32_T ts)
 	/* parallel PID */
 	v = P + I + D;
 //	printf("v = %f\n", v);
-	u = SCALE(v, -pid->sc, pid->sc, pid->sc);
+	u = SCALE(v, -pid->scale, pid->scale, pid->scale);
 //	printf("u = %d\n", u);
 
 	/* saturation filter */
-	u = sat(u, 0, pid->sc);
+	u = sat(u, 0, pid->scale);
 
 	/* integrator params */
 	if (pid->ti > 0)
@@ -127,7 +127,7 @@ uint16_T PIDCtl(pid_T *pid, uint16_T r, uint16_T y, real32_T ts)
 	}
 
 	/* updates */
-	pid->I = I + Ki * err + Kt * ((real32_T)UNSCALE(u, -pid->sc, pid->sc, pid->sc) - v);	// integrator update including anti-windup
+	pid->I = I + Ki * err + Kt * ((real32_T)UNSCALE(u, -pid->scale, pid->scale, pid->scale) - v);	// integrator update including anti-windup
 	pid->y = y;
 	pid->D = D;
 

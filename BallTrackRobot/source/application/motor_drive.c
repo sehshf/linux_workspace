@@ -1,5 +1,5 @@
 /*
- * servo_motor.c
+ * motor_drive.c
  *
  *  Created on: 22/10/2016
  *      Author: ses
@@ -10,7 +10,7 @@
  * APPLICATION INCLUDE FILES						*
  * **************************************************
  */
-#include "motor.h"
+#include "motor_drive.h"
 
 /*
  * **************************************************
@@ -144,7 +144,8 @@ int8_T GetServoPos(uint8_T motor)
 *  -------------------------------------------------------  *
 *  FUNCTION:
 *      DRIVEMOTOR()
-*      Return the absolute position of the specified servo motor.
+*      Drive the DC motor with the specified direction
+*      and speed.
 *
 *  Inputs:
 *      motor    : Specifies the DC motor.
@@ -211,5 +212,5 @@ void DriveMotor(motor_T *motor, int8_T direction, uint8_T speed)
 //} // END: LocalFunction()
 
 
-// EOF: servo_motor.c
+// EOF: motor_drive.c
 

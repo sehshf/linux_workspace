@@ -12,12 +12,7 @@
  */
 #include <stdio.h>
 
-#include "motor.h"
-/*
- * **************************************************
- * APPLICATION INCLUDE FILES						*
- * **************************************************
- */
+#include "../motor_drive.h"
 #include "portable.h"
 
 int main(void)
