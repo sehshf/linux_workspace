@@ -23,13 +23,12 @@ LIBS = -lm -lpthread
 #LIBS = -lmylib -lm
 
 # Output executable file
-OUTPUTFILE = TestCalibration.elf
+OUTPUTFILE = TestMotor.elf
 
 # Path
 PROJECT 	= /home/ses/workspace/BallTrackRobot
 BASIC		= $(PROJECT)/source/basic
 APPLICATION = $(PROJECT)/source/application
-DATAIO 		= $(PROJECT)/source/dataio
 TEST 		= $(APPLICATION)/test
 RELEASEDIR  = $(TEST)/test_release
 EXEDIR      = $(RELEASEDIR)/exe
@@ -40,22 +39,20 @@ OBJDIR      = $(RELEASEDIR)/obj
 INCLUDES =  	 \
 -I$(BASIC)		 \
 -I$(APPLICATION) \
--I$(DATAIO)		 \
 -I$(TEST)
 
 # Specify all paths of source files
-VPATH = $(BASIC) : $(APPLICATION) : $(DATAIO) : $(TEST)
+VPATH = $(BASIC) : $(APPLICATION) : $(TEST)
 
 # define the C source files
 # Extract source directories
 SRC_DIRS = $(subst :, ,$(VPATH))
 
-SRCS =  			\
-calibration.c		\
-params.c 			\
-test_calibration.c 	\
-tcpip.c
-
+SRCS =  		\
+i2c_smbus.c		\
+pca9685.c		\
+motor.c			\
+test_motor.c
 
 # define the C object files 
 #

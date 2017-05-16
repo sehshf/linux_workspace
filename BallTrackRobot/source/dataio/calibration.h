@@ -1,19 +1,21 @@
 /*
- * params.h
+ * calibration.h
  *
- *  Created on: Apr 27, 2017
+ *  Created on: May 4, 2017
  *      Author: ses
  */
 
-#ifndef _PARAMS_H_
-#define _PARAMS_H_
+#ifndef _CALIBRATION_H_
+#define _CALIBRATION_H_
 
 /*
  * **************************************************
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
-
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 
 /*
  * **************************************************
@@ -21,6 +23,7 @@
  * **************************************************
  */
 #include "portable.h"
+#include "tcpip.h"
 
 
 /*
@@ -28,24 +31,15 @@
  * DEFINITIONS										*
  * **************************************************
  */
-// Calibration/tuning parameters memory address
-#define CAL_ADDR 	0x20000000
-
-// Address steps for 8-byte and 16-byte data
-#define WORD(x) 	((x) * 1)
-
+// Calibration protocol
 /*
- * Calibration/Tuning parameters
+ * | Start | Address | Length | Value | End |
  */
-// "motors" component
-#define MOTORS_Kpan_C 			*MOTORS_Kpan
-#define MOTORS_Ktilt_C 			*MOTORS_Ktilt
-
-
-// "camera" component
-#define CAMERA_HSV_C			CAMERA_HSV		// array
-
-
+#define CAL_STRT_ID 		0x55
+#define CAL_END_ID 			0x99
+#define CAL_BUF_SIZE 		256
+#define GET_FLAG			0
+#define SET_FLAG			1
 
 /*
  * **************************************************
@@ -68,17 +62,6 @@
  * External VARIABLES       						*
  * **************************************************
  */
-/*
- * Calibration/Tuning parameters
- */
-// "motors" component
-extern real32_T *MOTORS_Kpan;
-extern real32_T *MOTORS_Ktilt;
-
-
-
-// "camera" component
-extern int32_T 	*CAMERA_HSV;
 
 
 /*
@@ -86,9 +69,9 @@ extern int32_T 	*CAMERA_HSV;
  * PROTOTYPES										*
  * **************************************************
  */
-void InitParamAddr(void);
-void InitParamVal(void);
+void RunCalibration(void);
 
-#endif // _PARAMS_H_
 
-// EOF: params.h
+#endif // _CALIBRATION_H_
+
+// EOF: calibration.h

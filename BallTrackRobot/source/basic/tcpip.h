@@ -1,19 +1,21 @@
 /*
- * params.h
+ * tcpip.h
  *
- *  Created on: Apr 27, 2017
+ *  Created on: May 5, 2017
  *      Author: ses
  */
 
-#ifndef _PARAMS_H_
-#define _PARAMS_H_
+#ifndef _TCPIP_H_
+#define _TCPIP_H_
 
 /*
  * **************************************************
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
-
+#include <stdio.h>
+#include<sys/socket.h>
+#include<arpa/inet.h> //inet_addr
 
 /*
  * **************************************************
@@ -28,23 +30,7 @@
  * DEFINITIONS										*
  * **************************************************
  */
-// Calibration/tuning parameters memory address
-#define CAL_ADDR 	0x20000000
-
-// Address steps for 8-byte and 16-byte data
-#define WORD(x) 	((x) * 1)
-
-/*
- * Calibration/Tuning parameters
- */
-// "motors" component
-#define MOTORS_Kpan_C 			*MOTORS_Kpan
-#define MOTORS_Ktilt_C 			*MOTORS_Ktilt
-
-
-// "camera" component
-#define CAMERA_HSV_C			CAMERA_HSV		// array
-
+#define SERVER_PORT 	8888
 
 
 /*
@@ -68,17 +54,6 @@
  * External VARIABLES       						*
  * **************************************************
  */
-/*
- * Calibration/Tuning parameters
- */
-// "motors" component
-extern real32_T *MOTORS_Kpan;
-extern real32_T *MOTORS_Ktilt;
-
-
-
-// "camera" component
-extern int32_T 	*CAMERA_HSV;
 
 
 /*
@@ -86,9 +61,9 @@ extern int32_T 	*CAMERA_HSV;
  * PROTOTYPES										*
  * **************************************************
  */
-void InitParamAddr(void);
-void InitParamVal(void);
+int32_T TCPServer(void);
 
-#endif // _PARAMS_H_
 
-// EOF: params.h
+#endif // _TCPIP_H_
+
+// EOF: tcpip.h

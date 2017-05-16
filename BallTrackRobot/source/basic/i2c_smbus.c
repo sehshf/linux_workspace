@@ -66,7 +66,7 @@ int32_T AccessI2CBus(const char *fName, int32_T addr)
 
 	if ((fd = open(fName, O_RDWR)) < 0)
 	{
-        fprintf(stderr, "Failed to open the I2C bus.");
+        fprintf(stderr, "Failed to open the I2C bus.\n");
         exit(1);
     }
 

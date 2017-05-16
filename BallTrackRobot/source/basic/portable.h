@@ -18,9 +18,9 @@ typedef enum {PASSED = 0, FAILED = 1}  	pf_T;
 typedef unsigned char 					uint8_T;
 typedef unsigned short int				uint16_T;
 typedef unsigned int 					uint32_T;
-typedef signed char 					int8_T;
-typedef signed short int				int16_T;
-typedef signed int 						int32_T;
+typedef char		 					int8_T;
+typedef short int						int16_T;
+typedef int 							int32_T;
 typedef float 							real32_T;
 typedef double 							real64_T;
 
