@@ -65,7 +65,7 @@ void InitParamAddr(void)
 
 	MOTORS_Kpan  	= (real32_T *)&paramAddr[n];	n += WORD(1);		// 0x20000000
 	MOTORS_Ktilt  	= (real32_T *)&paramAddr[n];	n += WORD(1);		// 0x20000004
-	CAMERA_HSV 		= (int32_T  *)&paramAddr[n];	n += WORD(6);		// 0x20000008
+	CAMERA_HSV		= (int32_T  *)&paramAddr[n];	n += WORD(6);		// 0x20000008
 	// 0x20000022
 
 } // END: InitParamAddr()
