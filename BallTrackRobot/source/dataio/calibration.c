@@ -26,6 +26,7 @@
  * FILE SCOPE VARIABLES (static)					*
  * **************************************************
  */
+// Data buffer for calibration
 uint8_T calBuf[CAL_BUF_SIZE];
 
 
@@ -48,8 +49,7 @@ static void SetParamVal(int32_T sock);
 *  -------------------------------------------------------  *
 *  FUNCTION:
 *      RUNCALIBRATION()
-*      Receive calibration raw data from the socket, unpack
-*      it and then update the corresponding parameter.
+*      Start parameter calibration using TCP/IP server
 *
 *  Inputs:
 *
@@ -61,10 +61,12 @@ static void SetParamVal(int32_T sock);
 */
 void RunCalibration(void)
 {
-    int32_T  sfd, sock;
-    socklen_t addrLen;
+    int32_T  	sfd, sock;
+    socklen_t 	addrLen;
+
     struct sockaddr addr;
 
+    // Start TCP/IP server
     sfd = TCPServer();
 
     addrLen = sizeof(addr);
@@ -94,11 +96,11 @@ void RunCalibration(void)
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      UPDATEPARAM()
-*      Unpack calibration raw data based on the protocol
-*      and update the corresponding parameter.
+*      CALHANdLER()
+*      Handle calibration request from TCP client
 *
 *  Inputs:
+*		sock: Socket handle
 *
 *  Outputs:
 *
@@ -109,8 +111,6 @@ void RunCalibration(void)
 static void CalHandler(int32_T sock)
 {
 	// Get starting byte 0
-	for (int i = 0; i < 16; i++)
-		printf("Byte %d: %x\n", i, (int32_T)calBuf[i]);
 	if (calBuf[0] != CAL_STRT_ID)
 	{
 		fprintf(stderr, "Calibration start ID is not valid.\n");
@@ -127,7 +127,7 @@ static void CalHandler(int32_T sock)
 		SetParamVal(sock);
 		 break;
 	}
-}
+} // END: CalHandler()
 
 
 /**
@@ -138,6 +138,7 @@ static void CalHandler(int32_T sock)
 *      and set the value of the corresponding parameter.
 *
 *  Inputs:
+*  		sock: Socket handle
 *
 *  Outputs:
 *
@@ -148,12 +149,12 @@ static void CalHandler(int32_T sock)
 static void GetParamVal(int32_T sock)
 {
 	uint32_T addr;
-	uint8_T len, packSize, buf[256];
+	uint8_T	 len, packSize, buf[CAL_BUF_SIZE];
 
 	// Get data (value) length
 	// from byte 5
-	len = calBuf[6];
-	packSize = 8 + len;
+	len 	 = calBuf[CAL_LENGTH_IDX];
+	packSize = CAL_FIXED_BYTES + len;
 
 	if (calBuf[packSize - 1] != CAL_END_ID)
 	{
@@ -162,26 +163,26 @@ static void GetParamVal(int32_T sock)
 	}
 
 	// Get the parameter address
-	memcpy(&addr, &calBuf[1], 4);
+	memcpy(&addr, &calBuf[1], CAL_ADDR_BYTES);
 	printf("address = 0x%x\n", addr);
 
 	/**************************************/
 	/* Start Packing data */
 
 	// Put start ID
-	buf[0] = CAL_STRT_ID;
+	buf[CAL_START_IDX] = CAL_STRT_ID;
 
 	// Put the parameter address
-	memcpy(&buf[1], &calBuf[1], 4);
+	memcpy(&buf[CAL_ADDR_IDX], &calBuf[CAL_ADDR_IDX], CAL_ADDR_BYTES);
 
 	// Put request flag
-	buf[5] = GET_FLAG;
+	buf[CAL_FLAG_IDX] = GET_FLAG;
 
 	// Put data length
-	buf[6] = len;
+	buf[CAL_LENGTH_IDX] = len;
 
 	// Put parameter value
-	memcpy(&buf[7], (uint32_T *)addr, len);
+	memcpy(&buf[CAL_VALUE_IDX], (uint32_T *)addr, len);
 
 	// Put end ID
 	buf[packSize - 1] = CAL_END_ID;
@@ -203,6 +204,7 @@ static void GetParamVal(int32_T sock)
 *      and set the value of the corresponding parameter.
 *
 *  Inputs:
+*  		sock: Socket handle
 *
 *  Outputs:
 *
@@ -213,12 +215,12 @@ static void GetParamVal(int32_T sock)
 static void SetParamVal(int32_T sock)
 {
 	uint32_T addr;
-	uint8_T len, packSize;
+	uint8_T  len, packSize;
 
 	// Get data (value) length
 	// from byte 5
-	len = calBuf[6];
-	packSize = 8 + len;
+	len 	 = calBuf[CAL_LENGTH_IDX];
+	packSize = CAL_FIXED_BYTES + len;
 
 	if (calBuf[packSize - 1] != CAL_END_ID)
 	{
@@ -228,12 +230,11 @@ static void SetParamVal(int32_T sock)
 
 	// Get the parameter address
 	// from bytes 1 to 4
-	memcpy(&addr, &calBuf[1], 4);
-	printf("address = 0x%x\n", addr);
+	memcpy(&addr, &calBuf[CAL_ADDR_IDX], CAL_ADDR_BYTES);
 
 	// Update parameter value
 	// from bytes 5 to 5 + len
-	memcpy((uint32_T *)addr, &calBuf[7], len);
+	memcpy((uint32_T *)addr, &calBuf[CAL_VALUE_IDX], len);
 
 	GetParamVal(sock);
 

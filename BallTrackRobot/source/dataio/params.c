@@ -63,6 +63,7 @@ void InitParamAddr(void)
 	uint32_T *paramAddr = (uint32_T *)CAL_ADDR;
 	uint32_T n = 0;
 
+	// Add new parameter to the bottom of the list
 	MOTORS_Kpan  	= (real32_T *)&paramAddr[n];	n += WORD(1);		// 0x20000000
 	MOTORS_Ktilt  	= (real32_T *)&paramAddr[n];	n += WORD(1);		// 0x20000004
 	CAMERA_HSV		= (int32_T  *)&paramAddr[n];	n += WORD(6);		// 0x20000008
@@ -79,8 +80,8 @@ void InitParamAddr(void)
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      INITPARAMADDR()
-*      Initialize the memory address of the parameters
+*      INITPARAMVAL()
+*      Default values for the parameters
 *
 *  Inputs:
 *

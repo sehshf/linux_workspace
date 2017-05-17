@@ -29,21 +29,21 @@
  * **************************************************
  */
 // Calibration/tuning parameters memory address
-#define CAL_ADDR 	0x20000000
+#define CAL_ADDR 			0x20000000
 
 // Address steps for 8-byte and 16-byte data
-#define WORD(x) 	((x) * 1)
+#define WORD(x) 			((x) * 1)
 
 /*
  * Calibration/Tuning parameters
  */
 // "motors" component
-#define MOTORS_Kpan_C 			*MOTORS_Kpan
-#define MOTORS_Ktilt_C 			*MOTORS_Ktilt
+#define MOTORS_Kpan_C 		*MOTORS_Kpan
+#define MOTORS_Ktilt_C 		*MOTORS_Ktilt
 
 
 // "camera" component
-#define CAMERA_HSV_C			CAMERA_HSV		// array
+#define CAMERA_HSV_C		CAMERA_HSV		// array
 
 
 

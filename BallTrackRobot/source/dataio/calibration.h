@@ -15,7 +15,7 @@
  */
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
+
 
 /*
  * **************************************************
@@ -40,6 +40,17 @@
 #define CAL_BUF_SIZE 		256
 #define GET_FLAG			0
 #define SET_FLAG			1
+#define CAL_ADDR_BYTES		4		// Length of address in bytes
+#define CAL_FIXED_BYTES		8		// NUmber of fixed bytes in protocol
+
+// Protocol byte indices
+#define CAL_START_IDX		0
+#define CAL_ADDR_IDX		1
+#define CAL_FLAG_IDX		5
+#define CAL_LENGTH_IDX		6
+#define CAL_VALUE_IDX		7
+
+
 
 /*
  * **************************************************
