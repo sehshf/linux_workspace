@@ -10,7 +10,7 @@
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
-#ifdef USE_MAP_ANON
+#ifdef 	USE_MAP_ANON
 #define _BSD_SOURCE
 #endif
 #include <sys/mman.h>
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 	InitParamAddr();
 	InitParamVal();
 
-	printf("value = %d\n", CAMERA_HSV_C[1]);
+	printf("value = %f\n", MOTORS_Kpan_C);
 
 	RunCalibration();
 
