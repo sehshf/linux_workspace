@@ -19,7 +19,7 @@ CFLAGS = -g -Wall -std=gnu++11
 # define any libraries to link into executable:
 #   if I want to link in libraries (libx.so or libx.a) I use the -llibname 
 #   option, something like (this will link in libmylib.so and libm.so:
-LIBS = -lm -lpthread
+LIBS = -lm -lpthread -lrt
 #LIBS = -lmylib -lm
 
 # Output executable file
@@ -29,7 +29,7 @@ OUTPUTFILE = TestMotor.elf
 PROJECT 	= /home/ses/workspace/BallTrackRobot
 BASIC		= $(PROJECT)/source/basic
 APPLICATION = $(PROJECT)/source/application
-TEST 		= $(APPLICATION)/test
+TEST 		= $(APPLICATION)/tests
 RELEASEDIR  = $(TEST)/test_release
 EXEDIR      = $(RELEASEDIR)/exe
 OBJDIR      = $(RELEASEDIR)/obj
@@ -49,9 +49,11 @@ VPATH = $(BASIC) : $(APPLICATION) : $(TEST)
 SRC_DIRS = $(subst :, ,$(VPATH))
 
 SRCS =  		\
+gpio.c			\
 i2c_smbus.c		\
+motor_drive.c	\
 pca9685.c		\
-motor.c			\
+speed_sensor.c	\
 test_motor.c
 
 # define the C object files 

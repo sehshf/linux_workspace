@@ -150,7 +150,7 @@ int8_T GetServoPos(uint8_T motor)
 *  Inputs:
 *      motor    : Specifies the DC motor.
 *      direction: Rotation direction
-*      speed	: Motor speed [0 100]
+*      speed	: Motor speed [%], range [MOTOR_MIN_SPEED 100]
 *
 *  Outputs:
 *      servoPos : Position.
@@ -172,7 +172,7 @@ void DriveMotor(motor_T *motor, int8_T direction, uint8_T speed)
 
 	// If there is no speed encoder, this ensures the motor run
 	if (speed > 0)
-		speed = max(speed, 15);
+		speed = max(speed, MOTOR_MIN_SPEED);
 
 	if (direction > 0)
 		SetPCAPWM(motor->id, speed);

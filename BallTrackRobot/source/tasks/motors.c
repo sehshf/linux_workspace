@@ -87,8 +87,8 @@ void RunMotors (uint16_T period)
 		eTilt = CV_SIZE_H / 2 - motorsInputs.ballLoc.y;
 
 		// P control
-		panAngle  = MOTORS_C.Kpan * ePan ;
-		tiltAngle = MOTORS_C.Ktilt * eTilt;
+		panAngle  = MOTORS_Kpan_C  * ePan ;
+		tiltAngle = MOTORS_Ktilt_C * eTilt;
 
 		// Drive pan and tilt motors
 		DriveServoInc(PAN_MOTOR ,  GETSIGN(panAngle ), abs(panAngle ));

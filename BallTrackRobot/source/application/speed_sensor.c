@@ -1,17 +1,16 @@
 /*
- * irt_sensor.c
+ * speed_sensor.c
  *
- *  Created on: 26/10/2016
+ *  Created on: May 20, 2017
  *      Author: ses
  */
-
 
 /*
  * **************************************************
  * APPLICATION INCLUDE FILES						*
  * **************************************************
  */
-#include "irt_sensor.h"
+#include "speed_sensor.h"
 
 
 /*
@@ -27,8 +26,7 @@
  * FILE SCOPE VARIABLES (static)					*
  * **************************************************
  */
-// File descriptor for I2C communication
-static int32_T  fd;
+
 
 
 /*
@@ -56,15 +54,29 @@ static int32_T  fd;
 *  Outputs:
 *
 *  Author: Ehsan Shafiei
-*  		   Oct 2016
+*  		   May 2017
 *  -------------------------------------------------------  *
 */
-void InitIRTSnsr(void)
+int32_T InitSpeedSnsr(uint8_T pin)
 {
+	sysGPIO_T 	gpio;
+	int32_T	  	fd;
 
-	fd = AccessI2CBus((const char *)I2C_FILE, IRTSNSR_ADDR);
+	// Setting for the GPIO pin
+	gpio.pin  		= pin;
+	gpio.direction	= SYS_GPIO_IN;
+	gpio.trigger 	= SYS_GPIO_FALLING;
+	gpio.actvLow	= TRUE;
 
-} // END: InitIRTSnsr()
+	// Apply the GPIO setting
+	ConfigSysGPIO(&gpio);
+
+	// Open GPIO port
+	fd = OpenSysGPIO(pin);
+
+	return fd;
+
+} // END: InitSpeedSnsr()
 
 
 /**
@@ -83,17 +95,44 @@ void InitIRTSnsr(void)
 *  		   Nov 2016
 *  -------------------------------------------------------  *
 */
-real32_T ReadIRTSnsr(uint8_T reg)
+uint16_T ReadSpeedSnsr(int32_T fd)
 {
-	real32_T temp;
+	int8_T	 gpioVal;
+	uint16_T cnt = 0, rpm = 0;
 
-	temp = wiringPiI2CReadReg16(fd, reg);
+	struct timespec tic, toc;
 
-	temp = temp * IRT_RES - KELVIN_CON;
+	real32_T dt;
 
-	return temp;
+	while (1)
+	{
+		// This is a blocking read
+		gpioVal = ReadSysGPIO(fd);
 
-} // END: ReadIRTSnsr()
+		if (gpioVal == TRUE)
+			cnt++;
+		else if (gpioVal == -1)		// timeout
+		{
+			return 0;				// Speed is zeros
+		}
+
+		// Calculate the speed after a complete revolution
+		switch (cnt)
+		{
+		case 1:
+			clock_gettime(CLOCK_REALTIME, &tic);
+			break;
+		case SPEED_SENSOR_RES + 1:
+			clock_gettime(CLOCK_REALTIME, &toc);
+			cnt = 0;
+			dt = (float)(toc.tv_sec + toc.tv_nsec * 1e-9 - tic.tv_sec - tic.tv_nsec * 1e-9);
+			rpm = 60 / dt;
+			return rpm;
+			break;
+		}
+	}
+
+} // END: ReadSpeedSnsr()
 
 
 /*
@@ -122,4 +161,4 @@ real32_T ReadIRTSnsr(uint8_T reg)
 //    return y;
 //} // END: LocalFunction()
 
-// EOF: irt_sensor.c
+// EOF: speed_sensor.c

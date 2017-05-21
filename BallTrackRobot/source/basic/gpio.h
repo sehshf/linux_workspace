@@ -19,6 +19,8 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <string.h>
+#include <poll.h>
 
 /*
  * **************************************************
@@ -32,18 +34,41 @@
  * DEFINITIONS										*
  * **************************************************
  */
+
+/******************* DIRECT GPIO ********************/
+
+// Direct GPIO operation from the registers map
 enum {GPIO_IN ,
 	  GPIO_OUT,
 	  GPIO_ALT
 	 };
 
-#define MMAP_GPIO_SIZE   (4 * 1024)
-#define PERI_BASE_ADR    0x3F000000    					// BCM2838 Peripheral starting address
-#define GPIO_BASE_ADR    (PERI_BASE_ADR + 0x200000)    	// GPIO starting address
-#define GPIO_SET		 7								// GPIO pin output set, IOs 0-31
-#define GPIO_CLR		 10								// GPIO pin output clear, IOs 0-31
-#define GPIO_LVL 		 13 							// GPIO Pin Level, IOs 0-31
-#define GPIO(x)			 x
+#define MMAP_GPIO_SIZE   	(4 * 1024)
+#define PERI_BASE_ADR    	0x3F000000    							// BCM2838 Peripheral starting address
+#define GPIO_BASE_ADR    	(PERI_BASE_ADR + 0x200000)    			// GPIO starting address
+#define GPIO_SET		 	7										// GPIO pin output set, IOs 0-31
+#define GPIO_CLR		 	10										// GPIO pin output clear, IOs 0-31
+#define GPIO_LVL 		 	13 										// GPIO Pin number, IOs 0-31
+#define GPIO(x)			 	x
+
+
+/******************* DIRECT GPIO ********************/
+
+/* SYSFS GPIO from "/sys/class/gpio"used for
+ * blocking poll() operation 				*/
+#define SYS_GPIO_DIRECTION  "/sys/class/gpio/gpio%d/direction"		// in/out direction. %d is replaced by the pin number
+#define SYS_GPIO_EDGE       "/sys/class/gpio/gpio%d/edge"			// "none", "rising", "falling", or "both". %d is replaced by the pin number
+#define SYS_GPIO_VALUE      "/sys/class/gpio/gpio%d/value"			// read/write value. %d is replaced by the pin number
+#define SYS_GPIO_ACTIVELOW  "/sys/class/gpio/gpio%d/active_low"		// read/write value. %d is replaced by the pin number
+#define SYS_GPIO_IN 		0
+#define SYS_GPIO_OUT 		1
+#define SYS_GPIO_NONE		0
+#define SYS_GPIO_RISING		1
+#define SYS_GPIO_FALLING	2
+#define SYS_GPIO_BOTH		3
+#define SYS_GPIO_HIGH 		'1'
+#define SYS_GPIO_LOW		'0'
+#define SYS_GPIO_TIMEOUT	100 										// Timeout for GPIO poll()
 
 /*
  * **************************************************
@@ -58,8 +83,15 @@ enum {GPIO_IN ,
  * TYPE DEFINITIONS									*
  * **************************************************
  */
+typedef struct
+{
+	uint8_T 	pin;
+	uint8_T 	direction;
+	uint8_T 	trigger;
+	boolean_T 	actvLow;
+} sysGPIO_T;
 
-
+typedef struct pollfd	pollFd_T;
 
 /*
  * **************************************************
@@ -151,11 +183,24 @@ inline boolean_T ReadGPIO(volatile uint32_T *mmapAdr, uint16_T gpio)
  * PROTOTYPES										*
  * **************************************************
  */
+
+/******************* DIRECT GPIO ********************/
+
 volatile uint32_T *MemMapGPIO(void);
 
 void ConfigGPIO(volatile uint32_T *mmapAdr, uint16_T gpio, uint16_T flag, uint16_T alt);
 
 void MemUnMapGPIO(void *pMap, int32_T fd);
+
+
+/******************** SYSFS GPIO ********************/
+
+void ConfigSysGPIO(sysGPIO_T *sysGPIO);
+
+int32_T OpenSysGPIO(uint8_T pin);
+
+int8_T ReadSysGPIO(int32_T fd);
+
 
 #endif // _GPIO_H_
 

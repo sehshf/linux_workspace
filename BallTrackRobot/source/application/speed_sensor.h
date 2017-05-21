@@ -1,18 +1,19 @@
 /*
- * motor_drive.h
+ * speed_sensor.h
  *
- *  Created on: 22/10/2016
+ *  Created on: May 20, 2017
  *      Author: ses
  */
 
-#ifndef _MOTORS_DRIVE_H_
-#define _MOTORS_DRIVE_H_
+#ifndef _SPEED_SENSOR_H_
+#define _SPEED_SENSOR_H_
 
 /*
  * **************************************************
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
+#include <time.h>
 
 
 /*
@@ -20,7 +21,8 @@
  * APPLICATION INCLUDE FILES						*
  * **************************************************
  */
-#include "pca9685.h"
+#include "gpio.h"
+
 
 
 /*
@@ -28,27 +30,12 @@
  * DEFINITIONS										*
  * **************************************************
  */
-// Pulse defines in ms
-#define SERVO_PULSE_NEUT	1500
-#define SERVO_PULSE_MIN		600
-#define SERVO_PULSE_MAX		2400
+#define LEFT_WHEEL 			20		// GPIO pin number
+#define RIGHT_WHEEL 		21		// GPIO pin number
+
+#define SPEED_SENSOR_RES	20		// Sensor resolution: pulses/revolution
 
 
-#define SERVO_POS_MAX		90
-#define SERVO_POS_MIN	   -90
-#define NUM_SERVOS 			2
-
-#define MOTOR_CCW			1
-#define MOTOR_CW		   -1
-
-#define PAN_MOTOR 			0
-#define TILT_MOTOR 			1
-#define LEFT_MOTOR			2
-// number 3 is reserved for LEFT_MOTOR direction
-#define RIGHT_MOTOR 		4
-// number 5 is reserved for RIGHT_MOTOR direction
-
-#define MOTOR_MIN_SPEED		10		// The minimum speed [%] required to start the rotation
 
 /*
  * **************************************************
@@ -63,12 +50,7 @@
  * TYPE DEFINITIONS									*
  * **************************************************
  */
-typedef struct
-{
-	uint8_T id;
-	int8_T  direction;
-	uint8_T speed;
-} motor_T;
+
 
 
 /*
@@ -85,16 +67,11 @@ typedef struct
  * PROTOTYPES										*
  * **************************************************
  */
-void InitMotors(void);
+int32_T InitSpeedSnsr(uint8_T pin);
 
-void DriveServoAbs(uint8_T motor, int8_T degree);
+uint16_T ReadSpeedSnsr(int32_T fd);
 
-void DriveServoInc(uint8_T motor, int8_T direction, int8_T degree);
 
-int8_T GetServoPos(uint8_T motor);
+#endif // _SPEED_SENSOR_H_
 
-void DriveMotor(motor_T *motor, int8_T direction, uint8_T speed);
-
-#endif // _SERVO_MOTOR_H_
-
-// EOF: motor_drive.h
+// EOF: speed_sensor.h

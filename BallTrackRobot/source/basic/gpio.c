@@ -34,6 +34,13 @@
  * LOCAL PROTOTYPES									*
  * **************************************************
  */
+static void AssignSysGPIOPin(uint8_T pin);
+
+static void AssignSysGPIODirection(uint8_T pin, uint8_T direction);
+
+static void AssignSysGPIOTrigger(uint8_T pin, uint8_T trigger);
+
+static void AssignSysGPIOActvLow(uint8_T pin, boolean_T state);
 
 
 
@@ -42,6 +49,9 @@
  * PUBLIC FUNCTIONS									*
  * **************************************************
  */
+
+/******************* DIRECT GPIO ********************/
+
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
@@ -137,6 +147,139 @@ void MemUnMapGPIO(void *pMap, int32_T fd)
 
 } // END: MemUnMapGPIO()
 
+
+
+/******************** SYSFS GPIO ********************/
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      CONFIGSYSGPIO()
+*      Configure GPIO as input, output or an alternative.
+*
+*  Inputs:
+*  		*mmapAdr : pointer to the GPIO mapped adress.
+*  		gpio 	 : gpio number
+*  		flag 	 : flag specifying the configuration type
+*  		alt 	 : alternative type number
+*
+*  Outputs:
+*
+*  Author: Ehsan Shafiei
+*  		   Mar 2017
+*  -------------------------------------------------------  *
+*/
+void ConfigSysGPIO(sysGPIO_T *sysGPIO)
+{
+	// Assign the pin
+	AssignSysGPIOPin(sysGPIO->pin);
+
+	// Assign direction
+	AssignSysGPIODirection(sysGPIO->pin, sysGPIO->direction);
+
+	// Assign trigger
+	AssignSysGPIOTrigger(sysGPIO->pin, sysGPIO->trigger);
+
+	// Assign active_low
+	AssignSysGPIOActvLow(sysGPIO->pin, sysGPIO->actvLow);
+
+} // END: ConfigSysGPIO()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      CONFIGSYSGPIO()
+*      Configure GPIO as input, output or an alternative.
+*
+*  Inputs:
+*  		*mmapAdr : pointer to the GPIO mapped adress.
+*  		gpio 	 : gpio number
+*  		flag 	 : flag specifying the configuration type
+*  		alt 	 : alternative type number
+*
+*  Outputs:
+*
+*  Author: Ehsan Shafiei
+*  		   Mar 2017
+*  -------------------------------------------------------  *
+*/
+int32_T OpenSysGPIO(uint8_T pin)
+{
+	char	str[50];
+	int32_T	fd;
+
+	// Open value file
+	sprintf(str, SYS_GPIO_VALUE, pin);
+	fd = open(str, O_RDWR);
+	if (fd < 0)
+	{
+		fprintf(stderr, "Failed to open GPIO value file.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	return fd;
+
+} // END: OpenSysGPIO()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      CONFIGSYSGPIO()
+*      Configure GPIO as input, output or an alternative.
+*
+*  Inputs:
+*  		*mmapAdr : pointer to the GPIO mapped adress.
+*  		gpio 	 : gpio number
+*  		flag 	 : flag specifying the configuration type
+*  		alt 	 : alternative type number
+*
+*  Outputs:
+*
+*  Author: Ehsan Shafiei
+*  		   Mar 2017
+*  -------------------------------------------------------  *
+*/
+int8_T ReadSysGPIO(int32_T fd)
+{
+	char	 buf;
+	int32_T	 retPoll;
+	int8_T	 retVal;
+	pollFd_T fds;
+
+	fds.fd 	   = fd;
+	fds.events = POLLPRI;
+
+	retPoll = poll(&fds, 1, SYS_GPIO_TIMEOUT);
+	if (retPoll < 0)
+	{
+		fprintf(stderr, "Failed to poll GPIO value file.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if (retPoll == 0)
+	{
+		retVal = -1;
+	}
+	else
+	{
+		lseek(fd, 0, SEEK_SET);
+		read (fd, &buf, 1);
+
+		if (buf == SYS_GPIO_HIGH)
+			retVal = TRUE;
+		else if (buf == SYS_GPIO_LOW)
+			retVal = FALSE;
+		else
+			exit(EXIT_FAILURE);
+	}
+
+	return retVal;
+
+} // END: ReadSysGPIO()
+
+
 /*
  * **************************************************
  * LOCAL FUNCTIONS									*
@@ -158,10 +301,170 @@ void MemUnMapGPIO(void *pMap, int32_T fd)
 *  		   Aug 2016
 *  -------------------------------------------------------  *
 */
-//static type LocalFunction(type x)
-//{
-//    return y;
-//} // END: LocalFunction()
+static void AssignSysGPIOPin(uint8_T pin)
+{
+	int32_T fd;
+	char 	str[2];
+
+	// Open "/sys/class/gpio/export"
+	fd = open("/sys/class/gpio/export", O_WRONLY);
+	if (fd < 0)
+	{
+		fprintf(stderr, "Failed to open /sys/class/gpio/export.\n");
+		exit(EXIT_FAILURE);
+	}
+	sprintf(str, "%d", pin);
+	write(fd, str, sizeof(str));
+	close(fd);
+
+} // END: AssignSysGPIOPin()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      LOCALFUCTION()
+*      What this function is doing.
+*
+*  Inputs:
+*      x : Input
+*
+*  Outputs:
+*      y : Returns 0 when succeeded.
+*
+*  Author: Ehsan Shafiei
+*  		   Aug 2016
+*  -------------------------------------------------------  *
+*/
+static void AssignSysGPIODirection(uint8_T pin, uint8_T direction)
+{
+	int32_T fd;
+	char str[50];
+
+	sprintf(str, SYS_GPIO_DIRECTION, pin);
+
+	fd = open(str, O_WRONLY);
+	if (fd < 0)
+	{
+		fprintf(stderr, "Failed to open GPIO direction file.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	switch (direction)
+	{
+	case SYS_GPIO_IN:
+		write(fd, "in", strlen("in"));
+		break;
+
+	case SYS_GPIO_OUT:
+		write(fd, "out", strlen("out"));
+		break;
+	}
+
+	close(fd);
+
+} // END: AssignSysGPIODirection()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      LOCALFUCTION()
+*      What this function is doing.
+*
+*  Inputs:
+*      x : Input
+*
+*  Outputs:
+*      y : Returns 0 when succeeded.
+*
+*  Author: Ehsan Shafiei
+*  		   Aug 2016
+*  -------------------------------------------------------  *
+*/
+static void AssignSysGPIOTrigger(uint8_T pin, uint8_T trigger)
+{
+	int32_T fd;
+	char str[50];
+
+	sprintf(str, SYS_GPIO_EDGE, pin);
+
+	fd = open(str, O_WRONLY);
+	if (fd < 0)
+	{
+		fprintf(stderr, "Failed to open GPIO edge file.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	switch (trigger)
+	{
+	case SYS_GPIO_NONE:
+		write(fd, "none", strlen("none"));
+		break;
+
+	case SYS_GPIO_RISING:
+		write(fd, "rising", strlen("rising"));
+		break;
+
+	case SYS_GPIO_FALLING:
+		write(fd, "falling", strlen("falling"));
+		break;
+
+	case SYS_GPIO_BOTH:
+		write(fd, "both", strlen("both"));
+		break;
+	}
+
+	close(fd);
+
+} // END: AssignSysGPIOTrigger()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      LOCALFUCTION()
+*      What this function is doing.
+*
+*  Inputs:
+*      x : Input
+*
+*  Outputs:
+*      y : Returns 0 when succeeded.
+*
+*  Author: Ehsan Shafiei
+*  		   Aug 2016
+*  -------------------------------------------------------  *
+*/
+static void AssignSysGPIOActvLow(uint8_T pin, boolean_T state)
+{
+	int32_T fd;
+	char str[50];
+
+	sprintf(str, SYS_GPIO_ACTIVELOW, pin);
+
+	fd = open(str, O_WRONLY);
+	if (fd < 0)
+	{
+		fprintf(stderr, "Failed to open GPIO active_low file.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	switch (state)
+	{
+	case TRUE:
+		write(fd, "1", strlen("1"));
+		break;
+
+	case FALSE:
+		write(fd, "0", strlen("0"));
+		break;
+	}
+
+	close(fd);
+
+} // END: AssignSysGPIOActvLow()
+
 
 // EOF: gpio.c
 
