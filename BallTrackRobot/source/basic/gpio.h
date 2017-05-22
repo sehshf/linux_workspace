@@ -68,7 +68,7 @@ enum {GPIO_IN ,
 #define SYS_GPIO_BOTH		3
 #define SYS_GPIO_HIGH 		'1'
 #define SYS_GPIO_LOW		'0'
-#define SYS_GPIO_TIMEOUT	100 										// Timeout for GPIO poll()
+#define SYS_GPIO_TIMEOUT	100 									// Timeout for GPIO poll()
 
 /*
  * **************************************************

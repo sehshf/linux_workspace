@@ -46,12 +46,14 @@
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      INITIRTSNSR()
-*      Initializing IR temperature sensor.
+*      INITSPEEDSNSR()
+*      Initializing speed sensor (rotary encoder).
 *
 *  Inputs:
+*  		pin : GPIO pin for reading the sensor pulses
 *
 *  Outputs:
+*  		fd  : SYSFS GPIO value file descriptor
 *
 *  Author: Ehsan Shafiei
 *  		   May 2017
@@ -82,17 +84,17 @@ int32_T InitSpeedSnsr(uint8_T pin)
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      READIRTSNSR()
-*      Reading IR temperature sensor.
+*      READSPEEDSNSR()
+*      Calculating rpm from the speed sensor.
 *
 *  Inputs:
-*      reg : Device register; defined in irt_sensor.h
+*      fd : descriptor of the opened value file.
 *
 *  Outputs:
-*      temp : temperature [°C].
+*      rpm : speed [rpm].
 *
 *  Author: Ehsan Shafiei
-*  		   Nov 2016
+*  		   May 2017
 *  -------------------------------------------------------  *
 */
 uint16_T ReadSpeedSnsr(int32_T fd)

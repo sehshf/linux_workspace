@@ -134,7 +134,8 @@ void ConfigGPIO(volatile uint32_T *mmapAdr, uint16_T gpio, uint16_T flag, uint16
 *  		*pMap : starting address of mapping returned by mmap()
 *  		fd	  : memory mapped file descriptor
 *
-*  Outputs:*
+*  Outputs:
+*
 *
 *  Author: Ehsan Shafiei
 *  		   Mar 2017
@@ -155,18 +156,16 @@ void MemUnMapGPIO(void *pMap, int32_T fd)
 *  -------------------------------------------------------  *
 *  FUNCTION:
 *      CONFIGSYSGPIO()
-*      Configure GPIO as input, output or an alternative.
+*      Configure GPIO through SYSFS files.
 *
 *  Inputs:
-*  		*mmapAdr : pointer to the GPIO mapped adress.
-*  		gpio 	 : gpio number
-*  		flag 	 : flag specifying the configuration type
-*  		alt 	 : alternative type number
+*  		*sysGPIO : GPIO struct.
 *
 *  Outputs:
 *
+*
 *  Author: Ehsan Shafiei
-*  		   Mar 2017
+*  		   May 2017
 *  -------------------------------------------------------  *
 */
 void ConfigSysGPIO(sysGPIO_T *sysGPIO)
@@ -189,19 +188,17 @@ void ConfigSysGPIO(sysGPIO_T *sysGPIO)
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      CONFIGSYSGPIO()
-*      Configure GPIO as input, output or an alternative.
+*      OPENSYSGPIO()
+*      Open SYSFS GPIO value file for read/write.
 *
 *  Inputs:
-*  		*mmapAdr : pointer to the GPIO mapped adress.
-*  		gpio 	 : gpio number
-*  		flag 	 : flag specifying the configuration type
-*  		alt 	 : alternative type number
+*  		pin : GPIO number
 *
 *  Outputs:
+*		fd  : SYSFS GPIO value file descriptor
 *
 *  Author: Ehsan Shafiei
-*  		   Mar 2017
+*  		   May 2017
 *  -------------------------------------------------------  *
 */
 int32_T OpenSysGPIO(uint8_T pin)
@@ -226,19 +223,17 @@ int32_T OpenSysGPIO(uint8_T pin)
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      CONFIGSYSGPIO()
-*      Configure GPIO as input, output or an alternative.
+*      READSYSGPIO()
+*      Read GPIO from SYSFS value file.
 *
 *  Inputs:
-*  		*mmapAdr : pointer to the GPIO mapped adress.
-*  		gpio 	 : gpio number
-*  		flag 	 : flag specifying the configuration type
-*  		alt 	 : alternative type number
+*  		fd : descriptor of the opened value file.
 *
 *  Outputs:
+*  		retVal : pin value (state)
 *
 *  Author: Ehsan Shafiei
-*  		   Mar 2017
+*  		   May 2017
 *  -------------------------------------------------------  *
 */
 int8_T ReadSysGPIO(int32_T fd)
@@ -288,17 +283,17 @@ int8_T ReadSysGPIO(int32_T fd)
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      LOCALFUCTION()
-*      What this function is doing.
+*      ASSIGNSYSGPIOPIN()
+*      Export SYSFS file of the GPIO pin.
 *
 *  Inputs:
-*      x : Input
+*      pin : GPIO number
 *
 *  Outputs:
-*      y : Returns 0 when succeeded.
+*
 *
 *  Author: Ehsan Shafiei
-*  		   Aug 2016
+*  		   May 2017
 *  -------------------------------------------------------  *
 */
 static void AssignSysGPIOPin(uint8_T pin)
@@ -323,17 +318,18 @@ static void AssignSysGPIOPin(uint8_T pin)
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      LOCALFUCTION()
-*      What this function is doing.
+*      ASSIGNSYSGPIODIRECTION()
+*      Assign input/output pin direction.
 *
 *  Inputs:
-*      x : Input
+*  		pin 	  : GPIO number
+*  		direction : IO direction (defined value)
 *
 *  Outputs:
-*      y : Returns 0 when succeeded.
+*
 *
 *  Author: Ehsan Shafiei
-*  		   Aug 2016
+*  		   May 2017
 *  -------------------------------------------------------  *
 */
 static void AssignSysGPIODirection(uint8_T pin, uint8_T direction)
@@ -369,17 +365,19 @@ static void AssignSysGPIODirection(uint8_T pin, uint8_T direction)
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      LOCALFUCTION()
-*      What this function is doing.
+*      ASSIGNSYSGPIOTRIGGER()
+*      Configure the trigger mode of the GPIO as
+*      "none", "rising", "falling", or "both".
 *
 *  Inputs:
-*      x : Input
+*  		pin 	: GPIO number
+*  		trigger : trigger mode (defined value)
 *
 *  Outputs:
-*      y : Returns 0 when succeeded.
+*
 *
 *  Author: Ehsan Shafiei
-*  		   Aug 2016
+*  		   May 2017
 *  -------------------------------------------------------  *
 */
 static void AssignSysGPIOTrigger(uint8_T pin, uint8_T trigger)
@@ -423,17 +421,18 @@ static void AssignSysGPIOTrigger(uint8_T pin, uint8_T trigger)
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      LOCALFUCTION()
-*      What this function is doing.
+*      ASSIGNSYSGPIOACTIVELOW()
+*      Set the active low status of the GPIO.
 *
 *  Inputs:
-*      x : Input
+*  		pin   : GPIO number
+*  		state : active low status
 *
 *  Outputs:
-*      y : Returns 0 when succeeded.
+
 *
 *  Author: Ehsan Shafiei
-*  		   Aug 2016
+*  		   May 2017
 *  -------------------------------------------------------  *
 */
 static void AssignSysGPIOActvLow(uint8_T pin, boolean_T state)
