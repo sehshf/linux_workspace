@@ -174,8 +174,8 @@ IplImage *FiltBall(IplImage *img)
 
     // Filter the image within the HSV range
     cvInRangeS( imgTmp,
-    			cvScalar(CAMERA_C.hsv[H_MIN], CAMERA_C.hsv[S_MIN], CAMERA_C.hsv[V_MIN]),
-                cvScalar(CAMERA_C.hsv[H_MAX], CAMERA_C.hsv[S_MAX], CAMERA_C.hsv[V_MAX]),
+    			cvScalar(CAMERA_HSV_C[H_MIN], CAMERA_HSV_C[S_MIN], CAMERA_HSV_C[V_MIN]),
+                cvScalar(CAMERA_HSV_C[H_MAX], CAMERA_HSV_C[S_MAX], CAMERA_HSV_C[V_MAX]),
 				imgFild
 			  );
 

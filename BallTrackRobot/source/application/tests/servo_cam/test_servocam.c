@@ -11,6 +11,10 @@
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
+#ifdef 	USE_MAP_ANON
+#define _BSD_SOURCE
+#endif
+#include <sys/mman.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -24,6 +28,18 @@
 
 int main(int argc, char *argv[])
 {
+	int32_T *addr, fd;
+
+	fd = open("/dev/zero", O_RDWR);
+
+	addr = (int32_T *)mmap((void *)CAL_ADDR, 256, PROT_WRITE | PROT_WRITE, MAP_PRIVATE, fd, 0);
+
+	if (addr == MAP_FAILED)
+		fprintf(stderr, "Mapping failed\n");
+
+	InitParamAddr();
+	InitParamVal();
+
 	real32_T Kpan = 0.04, Ktilt = 0.04, ePan, eTilt;
 	int8_T  panAngle, tiltAngle;
 
@@ -33,10 +49,10 @@ int main(int argc, char *argv[])
 
 	int8_T nDtcn = 0;
 
-	clock_t tic, toc;
-	real32_T dt;
+//	clock_t tic, toc;
+//	real32_T dt;
 
-	InitServos();
+	InitMotors();
 	DriveServoAbs(PAN_MOTOR ,   0);
 	DriveServoAbs(TILT_MOTOR, -45);
 
@@ -45,6 +61,7 @@ int main(int argc, char *argv[])
 	while(1)
 	{
 //		tic = clock();
+
 		img = cvQueryFrame(capture);
 
 		if (img == NULL)

@@ -30,7 +30,8 @@ HOME			= /home/ses
 PROJECT 		= $(HOME)/workspace/BallTrackRobot
 BASIC			= $(PROJECT)/source/basic
 APPLICATION 	= $(PROJECT)/source/application
-TEST 			= $(APPLICATION)/test
+DATAIO 			= $(PROJECT)/source/dataio
+TEST 			= $(APPLICATION)/tests
 RELEASEDIR  	= $(TEST)/test_release
 EXEDIR      	= $(RELEASEDIR)/exe
 OBJDIR      	= $(RELEASEDIR)/obj
@@ -42,23 +43,25 @@ OPENCV 			= $(OPENCVINCLUDE)/opencv
 INCLUDES = 			\
 -I$(BASIC)			\
 -I$(APPLICATION)	\
+-I$(DATAIO)			\
 -I$(TEST)			\
 -I$(OPENCVINCLUDE) 	\
 -I$(OPENCV)
 
 # Specify all paths of source files
-VPATH = $(BASIC) : $(APPLICATION) : $(TEST)
+VPATH = $(BASIC) : $(APPLICATION) : $(DATAIO) : $(TEST)
 
 # define the C source files
 # Extract source directories
 SRC_DIRS = $(subst :, ,$(VPATH))
 
 SRCS = 				\
+i2c_smbus.c			\
 computer_vision.c	\
 control.c			\
-i2c_smbus.c			\
+motor_drive.c       \
+params.c			\
 pca9685.c			\
-motor.c		        \
 test_servocam.c
 
 # define the C object files 
