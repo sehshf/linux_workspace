@@ -30,11 +30,11 @@
  * DEFINITIONS										*
  * **************************************************
  */
-#define LEFT_WHEEL 			20		// GPIO pin number
-#define RIGHT_WHEEL 		21		// GPIO pin number
+#define LEFT_WHEEL 			21		// GPIO pin number
+#define RIGHT_WHEEL 		20		// GPIO pin number
 
 #define SPEED_SENSOR_RES	20		// Sensor resolution: pulses/revolution
-
+#define WHEEL_STOP_TIME 	500	// Time to detect wheel stopped [ms]
 
 
 /*
@@ -69,7 +69,7 @@
  */
 int32_T InitSpeedSnsr(uint8_T pin);
 
-uint16_T ReadSpeedSnsr(int32_T fd);
+uint16_T ReadSpeedSnsr(int32_T sensor);
 
 
 #endif // _SPEED_SENSOR_H_

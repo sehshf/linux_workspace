@@ -98,7 +98,7 @@ void InitParamVal(void)
 	*MOTORS_Ktilt  	= 0.04f;
 
 	// "camera" component
-	CAMERA_HSV[0] 	= 22;
+	CAMERA_HSV[0] 	= 32; // 22
 	CAMERA_HSV[1] 	= 50;
 	CAMERA_HSV[2] 	= 20;
 	CAMERA_HSV[3] 	= 255;

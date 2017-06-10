@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	int32_T  leftSnsr;
 	uint16_T rpm;
 
-	motor_T motorLeft = {LEFT_MOTOR, 1, 0};
+	motor_T motorLeft = {LEFT_MOTOR, 1, 0}, motorRight = {RIGHT_MOTOR, 1, 0};
 
 	InitMotors();
 	leftSnsr = InitSpeedSnsr(LEFT_WHEEL);
@@ -41,7 +41,8 @@ int main(int argc, char *argv[])
 		printf("Enter direction:\n");
 		scanf("%hhd", &direction);
 
-		DriveMotor(&motorLeft, (int8_T)direction, (uint8_T)speed);
+		DriveMotor(&motorLeft , (int8_T)direction, (uint8_T)speed);
+		DriveMotor(&motorRight, (int8_T)direction, (uint8_T)speed);
 
 		rpm = ReadSpeedSnsr(leftSnsr);
 		printf("rpm = %d\n", rpm);

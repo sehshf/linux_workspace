@@ -62,12 +62,13 @@ enum
 	V_MAX,
 };
 
-// Ball location
+// Target Object
 typedef struct
 {
-    int32_T x;
+	int32_T area;
+	int32_T x;
     int32_T y;
-} ballLoc_T;
+} targetObj_T;
 
 /*
  * **************************************************
@@ -90,7 +91,7 @@ void TuneBallFilt(IplImage *img, int32_T x, int32_T y);
 
 IplImage *FiltBall(IplImage *img);
 
-boolean_T FindBall(IplImage *img, ballLoc_T *loc);
+boolean_T FindBall(IplImage *img, targetObj_T *ball);
 
 #endif // _COMPUTER_VISION_H_
 

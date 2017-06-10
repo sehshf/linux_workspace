@@ -43,10 +43,10 @@
 
 #define PAN_MOTOR 			0
 #define TILT_MOTOR 			1
-#define LEFT_MOTOR			2
-// number 3 is reserved for LEFT_MOTOR direction
-#define RIGHT_MOTOR 		4
-// number 5 is reserved for RIGHT_MOTOR direction
+#define LEFT_MOTOR			4
+// number 5 is reserved for LEFT_MOTOR direction
+#define RIGHT_MOTOR 		6
+// number 7 is reserved for RIGHT_MOTOR direction
 
 #define MOTOR_MIN_SPEED		10		// The minimum speed [%] required to start the rotation
 

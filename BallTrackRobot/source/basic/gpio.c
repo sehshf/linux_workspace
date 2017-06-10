@@ -236,7 +236,7 @@ int32_T OpenSysGPIO(uint8_T pin)
 *  		   May 2017
 *  -------------------------------------------------------  *
 */
-int8_T ReadSysGPIO(int32_T fd)
+int8_T ReadSysGPIO(int32_T fd, int32_T timeout)
 {
 	char	 buf;
 	int32_T	 retPoll;
@@ -246,14 +246,13 @@ int8_T ReadSysGPIO(int32_T fd)
 	fds.fd 	   = fd;
 	fds.events = POLLPRI;
 
-	retPoll = poll(&fds, 1, SYS_GPIO_TIMEOUT);
+	retPoll = poll(&fds, 1, timeout);
 	if (retPoll < 0)
 	{
 		fprintf(stderr, "Failed to poll GPIO value file.\n");
 		exit(EXIT_FAILURE);
 	}
-
-	if (retPoll == 0)
+	else if (retPoll == 0)
 	{
 		retVal = -1;
 	}

@@ -88,7 +88,7 @@ int32_T InitSpeedSnsr(uint8_T pin)
 *      Calculating rpm from the speed sensor.
 *
 *  Inputs:
-*      fd : descriptor of the opened value file.
+*      sensor : descriptor of the opened value file.
 *
 *  Outputs:
 *      rpm : speed [rpm].
@@ -97,7 +97,7 @@ int32_T InitSpeedSnsr(uint8_T pin)
 *  		   May 2017
 *  -------------------------------------------------------  *
 */
-uint16_T ReadSpeedSnsr(int32_T fd)
+uint16_T ReadSpeedSnsr(int32_T sensor)
 {
 	int8_T	 gpioVal;
 	uint16_T cnt = 0, rpm = 0;
@@ -109,7 +109,7 @@ uint16_T ReadSpeedSnsr(int32_T fd)
 	while (1)
 	{
 		// This is a blocking read
-		gpioVal = ReadSysGPIO(fd);
+		gpioVal = ReadSysGPIO(sensor, WHEEL_STOP_TIME);
 
 		if (gpioVal == TRUE)
 			cnt++;

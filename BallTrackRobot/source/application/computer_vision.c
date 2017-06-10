@@ -202,7 +202,7 @@ IplImage *FiltBall(IplImage *img)
 *          Feb 2017
 *  -------------------------------------------------------  *
 */
-boolean_T FindBall(IplImage *img, ballLoc_T *loc)
+boolean_T FindBall(IplImage *img, targetObj_T *ball)
 {
     static IplImage* imgTmp = cvCreateImage(CvSize(CV_SIZE_W, CV_SIZE_H), IPL_DEPTH_8U, 1);
 
@@ -230,8 +230,9 @@ boolean_T FindBall(IplImage *img, ballLoc_T *loc)
             // Check if it can be the ball
             if (area > AREA_MIN && area < AREA_MAX && area > lastArea)
             {
-                loc->x = (int32_T)(moment.m10 / moment.m00);
-                loc->y = (int32_T)(moment.m01 / moment.m00);
+                ball->x = (int32_T)(moment.m10 / moment.m00);
+                ball->y = (int32_T)(moment.m01 / moment.m00);
+                ball->area = area;
 
                 lastArea  = area;
                 find = TRUE;

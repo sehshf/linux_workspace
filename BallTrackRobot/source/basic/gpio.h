@@ -68,7 +68,7 @@ enum {GPIO_IN ,
 #define SYS_GPIO_BOTH		3
 #define SYS_GPIO_HIGH 		'1'
 #define SYS_GPIO_LOW		'0'
-#define SYS_GPIO_TIMEOUT	100 									// Timeout for GPIO poll()
+
 
 /*
  * **************************************************
@@ -199,7 +199,7 @@ void ConfigSysGPIO(sysGPIO_T *sysGPIO);
 
 int32_T OpenSysGPIO(uint8_T pin);
 
-int8_T ReadSysGPIO(int32_T fd);
+int8_T ReadSysGPIO(int32_T fd, int32_T timeout);
 
 
 #endif // _GPIO_H_
