@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 
 	fd = open("/dev/zero", O_RDWR);
 
-	addr = (int32_T *)mmap((void *)CAL_ADDR, 256, PROT_WRITE | PROT_WRITE, MAP_PRIVATE, fd, 0);
+	addr = (int32_T *)mmap((void *)PARAMS_ADDR, 256, PROT_WRITE | PROT_WRITE, MAP_PRIVATE, fd, 0);
 
 	if (addr == MAP_FAILED)
 		fprintf(stderr, "Mapping failed\n");

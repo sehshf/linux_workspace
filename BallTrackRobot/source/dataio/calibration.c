@@ -38,7 +38,7 @@ uint8_T calBuf[CAL_BUF_SIZE];
 static void CalHandler (int32_T sock);
 static void GetParamVal(int32_T sock);
 static void SetParamVal(int32_T sock);
-
+static void SaveParams (int32_T sock);
 
 /*
  * **************************************************
@@ -111,21 +111,23 @@ void RunCalibration(void)
 static void CalHandler(int32_T sock)
 {
 	// Get starting byte 0
-	if (calBuf[0] != CAL_STRT_ID)
+	if (calBuf[CAL_START_IDX] != CAL_STRT_ID)
 	{
 		fprintf(stderr, "Calibration start ID is not valid.\n");
 		return;
 	}
 
 	// Identify calibration request flag
-	switch (calBuf[5])
+	switch (calBuf[CAL_FLAG_IDX])
 	{
-	case GET_FLAG:
+	case GET_PARAM:
 		GetParamVal(sock);
 		break;
-	case SET_FLAG:
+	case SET_PARAM:
 		SetParamVal(sock);
 		 break;
+	case SAVE_PARAM:
+		SaveParams(sock);
 	}
 } // END: CalHandler()
 
@@ -176,7 +178,7 @@ static void GetParamVal(int32_T sock)
 	memcpy(&buf[CAL_ADDR_IDX], &calBuf[CAL_ADDR_IDX], CAL_ADDR_BYTES);
 
 	// Put request flag
-	buf[CAL_FLAG_IDX] = GET_FLAG;
+	buf[CAL_FLAG_IDX] = GET_PARAM;
 
 	// Put data length
 	buf[CAL_LENGTH_IDX] = len;
@@ -239,6 +241,44 @@ static void SetParamVal(int32_T sock)
 	GetParamVal(sock);
 
 } // END: SetParamVal()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      SAVEPARAMS()
+*      Save the calibration parameter values in a file.
+*
+*  Inputs:
+*  		sock: Socket handle
+*
+*  Outputs:
+*
+*  Author: Ehsan Shafiei
+*  		   June 2017
+*  -------------------------------------------------------  *
+*/
+static void SaveParams(int32_T sock)
+{
+	FILE *fd;
+	char *p = (char *)PARAMS_ADDR;
+
+	// Open the parameter file
+	fd = fopen(paramFile, "w");
+	if (fd == NULL)
+		fprintf(stderr, "Failed to open the parameter file\n");
+
+
+	// Write the parameter values from the specified
+	// memory address into the parameter file
+	if (fwrite(p, 1, PARAMS_SIZE, fd) == PARAMS_SIZE)
+		printf("parameters were written to %s\n", paramFile);
+	else
+		fprintf(stderr, "Failed to write the parameter file\n");
+
+	fclose(fd);
+
+} // END: SaveParams()
 
 
 // EOF: calibration.c

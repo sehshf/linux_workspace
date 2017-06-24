@@ -13,7 +13,10 @@
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
-
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
 
 /*
  * **************************************************
@@ -28,8 +31,12 @@
  * DEFINITIONS										*
  * **************************************************
  */
+// Parameter file
+#define paramFile 			"/home/pi/params"
+
 // Calibration/tuning parameters memory address
-#define CAL_ADDR 			0x20000000
+#define PARAMS_ADDR 		0x20000000
+#define PARAMS_SIZE			0x20
 
 // Address steps for 8-byte and 16-byte data
 #define WORD(x) 			((x) * 1)

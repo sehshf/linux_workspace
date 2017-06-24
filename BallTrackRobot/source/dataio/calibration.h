@@ -15,6 +15,7 @@
  */
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 
 /*
@@ -23,6 +24,7 @@
  * **************************************************
  */
 #include "portable.h"
+#include "params.h"
 #include "tcpip.h"
 
 
@@ -33,13 +35,11 @@
  */
 // Calibration protocol
 /*
- * | Start | Address | Length | Value | End |
+ * | Start | Address | Flag | Length | Value | End |
  */
 #define CAL_STRT_ID 		0x55
 #define CAL_END_ID 			0x99
 #define CAL_BUF_SIZE 		256
-#define GET_FLAG			0
-#define SET_FLAG			1
 #define CAL_ADDR_BYTES		4		// Length of address in bytes
 #define CAL_FIXED_BYTES		8		// NUmber of fixed bytes in protocol
 
@@ -50,6 +50,12 @@
 #define CAL_LENGTH_IDX		6
 #define CAL_VALUE_IDX		7
 
+enum
+{
+	GET_PARAM,
+	SET_PARAM,
+	SAVE_PARAM
+};
 
 
 /*
