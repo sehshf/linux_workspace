@@ -1,26 +1,19 @@
 /*
- * computer_vision.h
+ * sginal_processing.h
  *
- *  Created on: Feb 3, 2017
+ *  Created on: Aug 18, 2017
  *      Author: ses
  */
 
-#ifndef _COMPUTER_VISION_H_
-#define _COMPUTER_VISION_H_
-
+#ifndef _SIGNAL_PROCESSING_H_
+#define _SIGNAL_PROCESSING_H_
 
 /*
  * **************************************************
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
-#include <stdlib.h>
-#include <unistd.h>
-#include <cv.h>
-#include <highgui.h>
-#include <opencv2/opencv.hpp>
-#include <time.h>
-
+#include <string.h>
 
 /*
  * **************************************************
@@ -28,8 +21,6 @@
  * **************************************************
  */
 #include "portable.h"
-#include "params.h"
-#include "signal_processing.h"
 
 
 /*
@@ -37,8 +28,6 @@
  * DEFINITIONS										*
  * **************************************************
  */
-#define CV_SIZE_W   640
-#define CV_SIZE_H   480
 
 
 /*
@@ -54,31 +43,21 @@
  * TYPE DEFINITIONS									*
  * **************************************************
  */
-// HSV filter
-enum
-{
-	H_MIN,
-	H_MAX,
-	S_MIN,
-	S_MAX,
-	V_MIN,
-	V_MAX,
-};
-
-// Target Object
 typedef struct
 {
-	int32_T area;
-	int32_T x;
-    int32_T y;
-} targetObj_T;
+	uint32_T n;			// averaging window
+	real64_T val;		// recent value
+	real64_T avr;		// average value
+	real64_T array[];	// value array
+} moveAvr_T;
+
 
 /*
  * **************************************************
  * External VARIABLES       						*
  * **************************************************
  */
-extern CvCapture *capture;
+
 
 
 
@@ -87,18 +66,9 @@ extern CvCapture *capture;
  * PROTOTYPES										*
  * **************************************************
  */
-void InitCamera(void);
-void ExitCamera(void);
+void SimpleMovingAverage(moveAvr_T *avrObj);
 
-void TuneBallFilt(IplImage *img, int32_T x, int32_T y);
 
-IplImage *FiltBall(IplImage *img);
+#endif // _SIGNAL_PROCESSING_H_
 
-boolean_T FindBall(IplImage *img, targetObj_T *ball);
-
-real32_T BallArea(int32_T area);
-
-#endif // _COMPUTER_VISION_H_
-
-// EOF: computer_vision.h
-
+// EOF: signal_processing.h

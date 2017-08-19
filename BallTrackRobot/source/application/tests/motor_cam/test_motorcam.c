@@ -26,8 +26,8 @@
 #include "speed_sensor.h"
 
 
-#define AREA_SETPOINT		12000
-#define KP					0.002
+#define AREA_SETPOINT		10
+#define KP					0.25
 #define BIAS				10
 
 
@@ -38,6 +38,8 @@ int main(int argc, char *argv[])
 	boolean_T dtcdFlag = FALSE;
 	targetObj_T ball;
 	IplImage *img, *imgFild;
+
+	real32_T areaFilt = 0;
 
 	int8_T nDtcn = 0, nCapt = 0;
 
@@ -50,7 +52,7 @@ int main(int argc, char *argv[])
 
 	fd = open("/dev/zero", O_RDWR);
 
-	addr = (int32_T *)mmap((void *)CAL_ADDR, 256, PROT_WRITE | PROT_WRITE, MAP_PRIVATE, fd, 0);
+	addr = (int32_T *)mmap((void *)PARAMS_ADDR, 256, PROT_WRITE | PROT_WRITE, MAP_PRIVATE, fd, 0);
 
 	if (addr == MAP_FAILED)
 		fprintf(stderr, "Mapping failed\n");
@@ -94,16 +96,22 @@ int main(int argc, char *argv[])
 			nCapt++;
 		}
 
-		if (nDtcn > 1)
+		if (nDtcn > 0)
 		{
 			nDtcn = 0;
 			nCapt = 0;
 
-			err   		= AREA_SETPOINT - ball.area;
-			speed 		= KP * abs(err) + BIAS;
+			areaFilt = BallArea(ball.area);
+			err   	 = AREA_SETPOINT - areaFilt;
+
+			if (abs(err) > 2)
+				speed = KP * abs(err) + BIAS;
+			else
+				speed = 0;
+
 			direction 	= GETSIGN(err);
 
-//			printf("area = %d, speed = %d,\n", ball.area, speed);
+//			printf("areaFilt = %f, speed = %d\n", areaFilt, speed);
 
 			DriveMotor(&leftMotor , direction, speed);
 			DriveMotor(&rightMotor, direction, speed);

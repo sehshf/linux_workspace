@@ -187,7 +187,7 @@ IplImage *FiltBall(IplImage *img)
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      BALLFILT()
+*      FINDBALL()
 *      Find a tennis ball in a filtered binary image.
 *
 *  Inputs:
@@ -243,6 +243,41 @@ boolean_T FindBall(IplImage *img, targetObj_T *ball)
     return find;
 
 } // END: FindBall()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      BALLAREA()
+*      Filter the ball area signal.
+*
+*  Inputs:
+*       area: Ball area raw signal
+*
+*  Outputs:
+*       areaFilt: Filtered ball area. Simple moving average
+*        		  filter applied.
+*
+*  Author: Ehsan Shafiei
+*          Aug 2017
+*  -------------------------------------------------------  *
+*/
+real32_T BallArea(int32_T area)
+{
+	real32_T areaNorm, areaFilt;
+	static moveAvr_T areaObj = {.n = 10, .val = 0, .avr = 0};
+
+	// Normalize the signal to 0-100%
+	areaNorm    = (real32_T)(area - AREA_MIN) / (AREA_MAX - AREA_MIN) * 100;
+
+	areaObj.val = areaNorm;
+
+	SimpleMovingAverage(&areaObj);
+
+	areaFilt = (real32_T)areaObj.avr;
+
+	return areaFilt;
+}
 
 
 /*

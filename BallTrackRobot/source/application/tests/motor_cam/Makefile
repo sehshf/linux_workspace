@@ -64,6 +64,7 @@ motor_drive.c       \
 params.c			\
 pca9685.c			\
 speed_sensor.c		\
+signal_processing.c	\
 test_motorcam.c
 
 # define the C object files 

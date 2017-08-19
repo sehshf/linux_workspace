@@ -19,7 +19,7 @@ LFLAGS = -L/home/ses/opencv-3.2.0/build/install/lib
 # define any libraries to link into executable:
 #   if I want to link in libraries (libx.so or libx.a) I use the -llibname 
 #   option, something like (this will link in libmylib.so and libm.so:
-LIBS = -lm -lpthread -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lopencv_objdetect -ldl
+LIBS = -lm -lpthread -lrt -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lopencv_objdetect -ldl
 #LIBS = -lmylib -lm
 
 # Output executable file
@@ -30,7 +30,8 @@ HOME			= /home/ses
 PROJECT 		= $(HOME)/workspace/BallTrackRobot
 BASIC			= $(PROJECT)/source/basic
 APPLICATION 	= $(PROJECT)/source/application
-TEST 			= $(APPLICATION)/test
+DATAIO 			= $(PROJECT)/source/dataio
+TEST 			= $(APPLICATION)/tests
 RELEASEDIR  	= $(TEST)/test_release
 EXEDIR      	= $(RELEASEDIR)/exe
 OBJDIR      	= $(RELEASEDIR)/obj
@@ -42,12 +43,13 @@ OPENCV 			= $(OPENCVINCLUDE)/opencv
 INCLUDES = 			\
 -I$(BASIC)			\
 -I$(APPLICATION)	\
+-I$(DATAIO) 		\
 -I$(TEST)			\
 -I$(OPENCVINCLUDE) 	\
 -I$(OPENCV)
 
 # Specify all paths of source files
-VPATH = $(BASIC) : $(APPLICATION) : $(TEST)
+VPATH = $(BASIC) : $(APPLICATION) : $(DATAIO) : $(TEST)
 
 # define the C source files
 # Extract source directories
@@ -55,6 +57,7 @@ SRC_DIRS = $(subst :, ,$(VPATH))
 
 SRCS = 				\
 computer_vision.c	\
+params.c			\
 test_ball_track.c
 
 # define the C object files 

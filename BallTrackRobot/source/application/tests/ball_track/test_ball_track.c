@@ -10,11 +10,15 @@
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
+#ifdef 	USE_MAP_ANON
+#define _BSD_SOURCE
+#endif
+#include <sys/mman.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <math.h>
 #include <time.h>
+#include <fcntl.h>
 
 /*
  * **************************************************
@@ -29,15 +33,27 @@
 int main(void)
 {
     boolean_T dtcdFlag = FALSE;
-    ballLoc_T loc;
+    targetObj_T ball;
 
-	printf("Start video capturing\n");
-	CvCapture *capture =  cvCreateCameraCapture(0);
+    int32_T *addr, fd;
+
+	fd = open("/dev/zero", O_RDWR);
+
+	addr = (int32_T *)mmap((void *)PARAMS_ADDR, 256, PROT_WRITE | PROT_WRITE, MAP_PRIVATE, fd, 0);
+
+	if (addr == MAP_FAILED)
+		fprintf(stderr, "Mapping failed\n");
+
+	InitParamAddr();
+	InitParamVal();
+
+	InitCamera();
 
 	cvNamedWindow("piWindow", CV_WINDOW_AUTOSIZE);
 	cvMoveWindow ("piWindow", 400, 200);
 
 	IplImage *img, *imgFild;
+
 
 	while(1)
 	{
@@ -45,10 +61,10 @@ int main(void)
 
 		imgFild = FiltBall(img);
 
-		dtcdFlag = FindBall(imgFild, &loc);
+		dtcdFlag = FindBall(imgFild, &ball);
 
 		if (dtcdFlag)
-			cvCircle(img, CvPoint(loc.x, loc.y), 5, CV_RGB(255, 0, 0));
+			cvCircle(img, CvPoint(ball.x, ball.y), 5, CV_RGB(255, 0, 0));
 
 		cvShowImage("piWindow" , img);
 
