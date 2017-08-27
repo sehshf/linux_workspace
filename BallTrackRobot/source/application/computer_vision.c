@@ -60,11 +60,18 @@ static const int32_T AREA_MAX = 350 * 350;
 */
 void InitCamera(void)
 {
+	IplImage *img;
+
 	system("sudo modprobe bcm2835-v4l2");
 	usleep(50000);
 
 	printf("Start video capturing\n");
 	capture =  cvCreateCameraCapture(0);
+
+	// First run of FiltBall() takes longer time
+	// so that it is used in the initialization
+	img = cvQueryFrame(capture);
+	FiltBall(img);
 
 } // END: InitCamera()
 
@@ -202,19 +209,20 @@ IplImage *FiltBall(IplImage *img)
 *          Feb 2017
 *  -------------------------------------------------------  *
 */
-boolean_T FindBall(IplImage *img, targetObj_T *ball)
+void FindBall(IplImage *img, targetObj_T *ball)
 {
     static IplImage* imgTmp = cvCreateImage(CvSize(CV_SIZE_W, CV_SIZE_H), IPL_DEPTH_8U, 1);
 
     static int32_T         numCont;                             // number of contours
     static CvMemStorage    *storage = cvCreateMemStorage(0);    // storage block for contours
     static CvSeq           *firstCont = NULL;                   // first contour in a sequence
-    static CvMoments       moment;                              // special and central moment
+    static CvMoments       moment;                              // spatial and central moment
 
     int32_T     area, lastArea = 0;
-    boolean_T   find = FALSE;
 
     cvCopy(img, imgTmp, NULL);
+
+    ball->detcd = FALSE;
 
     numCont = cvFindContours(imgTmp, storage, &firstCont);
 
@@ -235,13 +243,10 @@ boolean_T FindBall(IplImage *img, targetObj_T *ball)
                 ball->area = area;
 
                 lastArea  = area;
-                find = TRUE;
+                ball->detcd = TRUE;
             }
         }
     }
-
-    return find;
-
 } // END: FindBall()
 
 
@@ -265,7 +270,7 @@ boolean_T FindBall(IplImage *img, targetObj_T *ball)
 real32_T BallArea(int32_T area)
 {
 	real32_T areaNorm, areaFilt;
-	static moveAvr_T areaObj = {.n = 10, .val = 0, .avr = 0};
+	static moveAvr_T areaObj = {.n = 10};
 
 	// Normalize the signal to 0-100%
 	areaNorm    = (real32_T)(area - AREA_MIN) / (AREA_MAX - AREA_MIN) * 100;
@@ -277,6 +282,45 @@ real32_T BallArea(int32_T area)
 	areaFilt = (real32_T)areaObj.avr;
 
 	return areaFilt;
+}
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      BALLAREA()
+*      Filter the ball area signal.
+*
+*  Inputs:
+*       area: Ball area raw signal
+*
+*  Outputs:
+*       areaFilt: Filtered ball area. Simple moving average
+*        		  filter applied.
+*
+*  Author: Ehsan Shafiei
+*          Aug 2017
+*  -------------------------------------------------------  *
+*/
+loc_T BallLocation(int32_T x, int32_T y)
+{
+	loc_T locNorm, locFilt;
+	static moveAvr_T xObj = {.n = 2}, yObj = {.n = 2};
+
+	// Normalize the signals to 0-100%
+	locNorm.x = (real32_T)x / CV_SIZE_W * 100;
+	locNorm.y = (real32_T)y / CV_SIZE_H * 100;
+
+	xObj.val = locNorm.x;
+	yObj.val = locNorm.y;
+
+	SimpleMovingAverage(&xObj);
+	SimpleMovingAverage(&yObj);
+
+	locFilt.x = (real32_T)xObj.avr;
+	locFilt.y = (real32_T)yObj.avr;
+
+	return locFilt;
 }
 
 

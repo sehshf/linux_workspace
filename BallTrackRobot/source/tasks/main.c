@@ -10,8 +10,7 @@
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
-#include <stdio.h>
-#include <sys/mman.h>
+
 
 /*
  * **************************************************
@@ -28,45 +27,24 @@ int main()
 	struct sched_param schedParam;
 
 	// Task period as multiplication of the baserate
-	uint16_T period[NUM_TASKS] = {10, 10};
+	uint16_T period[NUM_TASKS] = {CAMERA_TASK_RATE, MOTORS_TASK_RATE};
 
 	uint32_T i;
-
-	if (mlockall(MCL_CURRENT | MCL_FUTURE) < 0)
-	{
-		fprintf(stderr, "Error: mlockall failed - cannot lock application in memory\n");
-		return FAILED;
-	}
 
 	// Initializations
 	InitRTTasks(period);
 
 	// Prepare tasks attributes
-	if (pthread_attr_init(&attr) != 0)
-	{
-		fprintf(stderr, "pthread_attr_init failed\n");
-		return FAILED;
-	}
+	SetAttribute(&attr);
 
-	if (pthread_attr_setinheritsched(&attr, PTHREAD_EXPLICIT_SCHED) != 0)
-	{
-		fprintf(stderr, "pthread_attr_setinheritsched failed\n");
-		return FAILED;
-	}
-
-	if (pthread_attr_setschedpolicy(&attr, SCHED_FIFO) != 0)
-	{
-		fprintf(stderr, "pthread_attr_setschedpolicy SCHED_FIFO failed\n");
-		return FAILED;
-	}
-
+	// Real-time tasks
 	for (i = 0; i < NUM_TASKS; i++)
 	{
-		CreateRTTask(task[i], attr, (int16_T) MAX_PRIO - i, schedParam, period[i], TaskRoutine, (uint32_T *)i);
+		CreateRTTask(task[i], &attr, (int16_T)MAX_PRIO - i, &schedParam, TaskRoutine, (uint32_T *)i);
 	}
 
 	// Base rate
-	schedParam.sched_priority = MAX_PRIO + 1;
+	schedParam.__sched_priority = MAX_PRIO + 1;
 
 	if (pthread_attr_setschedparam(&attr, &schedParam) != 0)
 	{

@@ -13,9 +13,11 @@
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
+#include <sys/mman.h>
 #include <pthread.h>
 #include <semaphore.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -33,15 +35,19 @@
  * DEFINITIONS										*
  * **************************************************
  */
-#define NUM_TASKS 	2
 #define MAX_PRIO	(sched_get_priority_min(SCHED_FIFO) + NUM_TASKS)
+
+// Task period as multiplication of the baserate
+#define BASE_PERIOD			5		// 5 ms
+#define CAMERA_TASK_RATE	7
+#define MOTORS_TASK_RATE	7
 
 // Tasks enum should be ordered based on the tasks priorities
 enum
 {
 	CAMERA_TASK,
-	MOTORS_TASK
-
+	MOTORS_TASK,
+	NUM_TASKS
 };
 
 /*
@@ -68,7 +74,7 @@ typedef struct
 	sem_t 	  		sem;
 	pthread_t 		thread;
 	uint16_T  		period;	// Coefficient of the base period.
-	pthread_mutex_t *mutex;
+	pthread_mutex_t mutex;
 } task_T;
 
 /*
@@ -85,13 +91,14 @@ extern real32_T  baseTs;
  * PROTOTYPES										*
  * **************************************************
  */
+void SetAttribute(pthread_attr_t *attr);
+
 void InitRTTasks(uint16_T period[NUM_TASKS]);
 
 pf_T CreateRTTask(task_T task,
-				  pthread_attr_t attr,
+				  pthread_attr_t *attr,
 				  int16_T prio,
-				  struct sched_param schedParam,
-				  uint16_T period,
+				  struct sched_param *schedParam,
 				  void *(*TaskRoutine) (void *),
 				  void *threadArg
 				 );

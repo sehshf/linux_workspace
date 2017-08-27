@@ -55,19 +55,20 @@ VPATH = $(BASIC) : $(APPLICATION) : $(TASKS) : $(DATAIO)
 # Extract source directories
 SRC_DIRS = $(subst :, ,$(VPATH))
 
-SRCS = 				\
-camera.c 			\
-common.c 			\
-computer_vision.c	\
-control.c			\
-i2c_smbus.c			\
-gpio.c 				\
-main.c				\
-motor_drive.c       \
-motors.c			\
-params.c			\
-pca9685.c			\
-rt_tasks.c
+SRCS = 					\
+camera.c 				\
+common.c 				\
+computer_vision.c		\
+control.c				\
+i2c_smbus.c				\
+gpio.c 					\
+main.c					\
+motor_drive.c       	\
+motors.c				\
+params.c				\
+pca9685.c				\
+rt_tasks.c				\
+signal_processing.c
 
 # define the C object files 
 #

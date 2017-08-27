@@ -27,7 +27,7 @@
  * GLOBAL VARIABLES (extern)						*
  * **************************************************
  */
-cameraOutputs_T cameraOutputs = { .ballLoc = {.x = 0, .y = 0} };
+cameraOutputs_T cameraOutputs = { .ball = {.detcd = FALSE, .area = 0, .x = 0, .y = 0} };
 
 
 /*
@@ -67,39 +67,22 @@ void UpdateCameraOutputs(cameraOutputs_T *outputs);
 */
 void RunCamera(uint16_T period)
 {
-	static real32_T count = 0;
+	static cameraOutputs_T outputs;
 
-	cameraOutputs_T outputs;
+	IplImage *img, *imgFild;
 
-	boolean_T 	dtcdFlag = FALSE;
-	IplImage 	*img, *imgFild;
-	int8_T 		nDtcn = 0;
+	outputs.ball.detcd = FALSE;
 
-	count++;
-	if (count == period / baseTs)
+	img = cvQueryFrame(capture);
+
+	if (img != NULL)
 	{
-		count = 0;
-		do
-		{
-			img = cvQueryFrame(capture);
-		} while (img == NULL);
-
-		imgFild = FiltBall(img);
-
-		dtcdFlag = FindBall(imgFild, &(outputs.ballLoc));
-
-		if (dtcdFlag)
-			nDtcn = nDtcn + dtcdFlag;
-		else
-			nDtcn = 0;
-
-		if (nDtcn > 1)
-		{
-			nDtcn = 0;
-			// Update the component outputs
-			UpdateCameraOutputs(&outputs);
-		}
+		imgFild  = FiltBall(img);
+		FindBall(imgFild, &(outputs.ball));
 	}
+
+	// Update the component outputs
+	UpdateCameraOutputs(&outputs);
 
 } // END: RunCamera()
 
@@ -124,9 +107,9 @@ void RunCamera(uint16_T period)
 */
 void UpdateCameraOutputs(cameraOutputs_T *outputs)
 {
-	pthread_mutex_lock(task[CAMERA_TASK].mutex);
+	pthread_mutex_lock(&(task[CAMERA_TASK].mutex));
 	cameraOutputs = *outputs;
-	pthread_mutex_unlock(task[CAMERA_TASK].mutex);
+	pthread_mutex_unlock(&(task[CAMERA_TASK].mutex));
 
 } // END: UpdateCameraOutputs()
 

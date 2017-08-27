@@ -13,10 +13,12 @@
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
+#include <sys/mman.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 /*
  * **************************************************

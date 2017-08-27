@@ -68,10 +68,18 @@ enum
 // Target Object
 typedef struct
 {
+	boolean_T detcd;
 	int32_T area;
 	int32_T x;
     int32_T y;
 } targetObj_T;
+
+// Location
+typedef struct
+{
+	real32_T x;
+	real32_T y;
+} loc_T;
 
 /*
  * **************************************************
@@ -94,9 +102,11 @@ void TuneBallFilt(IplImage *img, int32_T x, int32_T y);
 
 IplImage *FiltBall(IplImage *img);
 
-boolean_T FindBall(IplImage *img, targetObj_T *ball);
+void FindBall(IplImage *img, targetObj_T *ball);
 
 real32_T BallArea(int32_T area);
+
+loc_T BallLocation(int32_T x, int32_T y);
 
 #endif // _COMPUTER_VISION_H_
 

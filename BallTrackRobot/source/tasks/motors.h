@@ -34,7 +34,7 @@
  */
 typedef struct
 {
-	ballLoc_T ballLoc;
+	targetObj_T ball;
 } motorsInputs_T;
 
 

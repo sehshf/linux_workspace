@@ -59,6 +59,15 @@ int32_T  *CAMERA_HSV;
 */
 void InitParamAddr(void)
 {
+	int32_T *addr, fd;
+
+	// Memory map for parameters
+	fd 	 = open("/dev/zero", O_RDWR);
+	addr = (int32_T *)mmap((void *)PARAMS_ADDR, 256, PROT_WRITE | PROT_WRITE, MAP_PRIVATE, fd, 0);
+
+	if (addr == MAP_FAILED)
+		fprintf(stderr, "Mapping failed\n");
+
 	// Array of memory addresses for parameters
 	uint32_T *paramAddr = (uint32_T *)PARAMS_ADDR;
 	uint32_T n = 0;
@@ -94,8 +103,8 @@ void InitParamAddr(void)
 void InitParamVal(void)
 {
 	// "motors" component
-	*MOTORS_Kpan  	= 0.04f;
-	*MOTORS_Ktilt  	= 0.04f;
+	*MOTORS_Kpan  	= 0.14f;
+	*MOTORS_Ktilt  	= 0.13f;
 
 	// "camera" component
 	CAMERA_HSV[0] 	= 30;

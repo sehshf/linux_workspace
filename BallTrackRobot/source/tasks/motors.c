@@ -67,33 +67,42 @@ void GetMotorsInputs(motorsInputs_T *inputs);
 */
 void RunMotors (uint16_T period)
 {
-	static real32_T count = 0;
-
 	motorsInputs_T motorsInputs;
 
+	loc_T	 loc;
 	real32_T ePan, eTilt;
 	int8_T   panAngle, tiltAngle;
 
 	// Get the motors component inputs
 	GetMotorsInputs(&motorsInputs);
 
-	count++;
-	if (count == period / baseTs)
+	if (motorsInputs.ball.detcd)
 	{
-		count = 0;
-
 		// Calculate the position errors
-		ePan  = CV_SIZE_W / 2 - motorsInputs.ballLoc.x;
-		eTilt = CV_SIZE_H / 2 - motorsInputs.ballLoc.y;
-
-		// P control
-		panAngle  = MOTORS_Kpan_C  * ePan ;
-		tiltAngle = MOTORS_Ktilt_C * eTilt;
-
-		// Drive pan and tilt motors
-		DriveServoInc(PAN_MOTOR ,  GETSIGN(panAngle ), abs(panAngle ));
-		DriveServoInc(TILT_MOTOR, -GETSIGN(tiltAngle), abs(tiltAngle));
+		loc 	= BallLocation(motorsInputs.ball.x, motorsInputs.ball.y);
+		ePan  	= 50 - loc.x;
+		eTilt 	= 50 - loc.y;
 	}
+	else
+	{
+		ePan  = 0;
+		eTilt = 0;
+	}
+
+	// P control
+	if (abs(ePan) > 1)
+		panAngle  = MOTORS_Kpan_C  * ePan ;
+	else
+		panAngle = 0;
+
+	if (abs(eTilt) > 1)
+		tiltAngle = MOTORS_Ktilt_C * eTilt;
+	else
+		tiltAngle = 0;
+
+	// Drive pan and tilt motors
+	DriveServoInc(PAN_MOTOR ,  GETSIGN(panAngle ), abs(panAngle ));
+	DriveServoInc(TILT_MOTOR, -GETSIGN(tiltAngle), abs(tiltAngle));
 
 } // END: RunMotors()
 
@@ -118,7 +127,7 @@ void RunMotors (uint16_T period)
 */
 void GetMotorsInputs(motorsInputs_T *inputs)
 {
-	inputs->ballLoc = cameraOutputs.ballLoc;
+	inputs->ball = cameraOutputs.ball;
 
 } // END: GetMotorsInputs()
 

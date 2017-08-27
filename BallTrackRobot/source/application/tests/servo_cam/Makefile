@@ -62,6 +62,7 @@ control.c			\
 motor_drive.c       \
 params.c			\
 pca9685.c			\
+signal_processing.c	\
 test_servocam.c
 
 # define the C object files 

@@ -14,6 +14,7 @@
  * **************************************************
  */
 #include <string.h>
+#include <stdio.h>
 
 /*
  * **************************************************
@@ -28,7 +29,7 @@
  * DEFINITIONS										*
  * **************************************************
  */
-
+#define MAX_AVERAGE_LENGTH	10
 
 /*
  * **************************************************
@@ -45,10 +46,10 @@
  */
 typedef struct
 {
-	uint32_T n;			// averaging window
-	real64_T val;		// recent value
-	real64_T avr;		// average value
-	real64_T array[];	// value array
+	uint32_T n;								// averaging window
+	real64_T val;							// recent value
+	real64_T avr;							// average value
+	real64_T array[MAX_AVERAGE_LENGTH];		// value array
 } moveAvr_T;
 
 

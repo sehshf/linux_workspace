@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 
 	fd = open("/dev/zero", O_RDWR);
 
-	addr = (int32_T *)mmap((void *)CAL_ADDR, 256, PROT_WRITE | PROT_WRITE, MAP_PRIVATE, fd, 0);
+	addr = (int32_T *)mmap((void *)PARAMS_ADDR, 256, PROT_WRITE | PROT_WRITE, MAP_PRIVATE, fd, 0);
 
 	if (addr == MAP_FAILED)
 		fprintf(stderr, "Mapping failed\n");
@@ -40,17 +40,16 @@ int main(int argc, char *argv[])
 	InitParamAddr();
 	InitParamVal();
 
-	real32_T Kpan = 0.04, Ktilt = 0.04, ePan, eTilt;
-	int8_T  panAngle, tiltAngle;
+	const real32_T Kpan = 0.14, Ktilt = 0.13;
+	real32_T ePan, eTilt;
+	int8_T   panAngle, tiltAngle;
+	loc_T	 loc;
 
-	boolean_T dtcdFlag = FALSE;
-	ballLoc_T loc;
+	targetObj_T ball;
 	IplImage *img, *imgFild;
 
-	int8_T nDtcn = 0;
-
-//	clock_t tic, toc;
-//	real32_T dt;
+	clock_t tic, toc;
+	real32_T dt;
 
 	InitMotors();
 	DriveServoAbs(PAN_MOTOR ,   0);
@@ -60,7 +59,7 @@ int main(int argc, char *argv[])
 
 	while(1)
 	{
-//		tic = clock();
+		tic = clock();
 
 		img = cvQueryFrame(capture);
 
@@ -69,29 +68,40 @@ int main(int argc, char *argv[])
 
 		imgFild = FiltBall(img);
 
-		dtcdFlag = FindBall(imgFild, &loc);
-//		toc = clock();
-//		dt = (real32_T)(toc - tic) / CLOCKS_PER_SEC;
+		FindBall(imgFild, &ball);
 
-		if (dtcdFlag)
-			nDtcn = nDtcn + dtcdFlag;
-		else
-			nDtcn = 0;
-
-		if (nDtcn > 1)
+		if (ball.detcd)
 		{
-			nDtcn = 0;
+			loc 	= BallLocation(ball.x, ball.y);
+			ePan  	= 50 - loc.x;
+			eTilt 	= 50 - loc.y;
 
-			ePan  = CV_SIZE_W / 2 - loc.x;
-			eTilt = CV_SIZE_H / 2 - loc.y;
-
-			// P control
-			panAngle  = Kpan  * ePan ;
-			tiltAngle = Ktilt * eTilt;
-
-			DriveServoInc(PAN_MOTOR ,  GETSIGN(panAngle) , abs(panAngle) );
-			DriveServoInc(TILT_MOTOR, -GETSIGN(tiltAngle), abs(tiltAngle));
+//			tic = clock();
+//			printf("(%f, %f)\n", ePan, eTilt);
+//			toc = clock();
+//			dt = (real32_T)(toc - tic) / CLOCKS_PER_SEC;
+//			printf("dt = %f\n", dt);
 		}
+		else
+		{
+			ePan  = 0;
+			eTilt = 0;
+		}
+		// P control
+		if (abs(ePan) > 2)
+			panAngle  = Kpan  * ePan ;
+		else
+			panAngle = 0;
+
+		if (abs(eTilt) > 2)
+			tiltAngle = Ktilt * eTilt;
+		else
+			tiltAngle = 0;
+
+		DriveServoInc(PAN_MOTOR ,  GETSIGN(panAngle) , abs(panAngle) );
+		DriveServoInc(TILT_MOTOR, -GETSIGN(tiltAngle), abs(tiltAngle));
+
+		usleep(10000);
 	}
 
 	ExitCamera();
