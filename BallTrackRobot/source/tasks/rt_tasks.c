@@ -129,8 +129,8 @@ void InitRTTasks(uint16_T period[NUM_TASKS])
 
 	InitParamAddr();
 	InitParamVal();
-	InitCamera();
 	InitMotors();
+	InitCamera();
 
 	printf("Real-time tasks has been initialized.\n");
 	usleep(50000);

@@ -22,11 +22,12 @@
  * Calibration/Tuning parameters
  */
 // "motors" component
-real32_T *MOTORS_Kpan;
-real32_T *MOTORS_Ktilt;
+real32_T 	*MOTORS_Kpan;
+real32_T 	*MOTORS_Ktilt;
+real32_T 	*MOTORS_Kazim;
 
 // "camera" component
-int32_T  *CAMERA_HSV;
+int32_T  	*CAMERA_HSV;
 
 
 /*
@@ -75,8 +76,9 @@ void InitParamAddr(void)
 	// Add new parameter to the bottom of the list
 	MOTORS_Kpan  	= (real32_T *)&paramAddr[n];	n += WORD(1);		// 0x20000000
 	MOTORS_Ktilt  	= (real32_T *)&paramAddr[n];	n += WORD(1);		// 0x20000004
-	CAMERA_HSV		= (int32_T  *)&paramAddr[n];	n += WORD(6);		// 0x20000008
-	// 0x20000020
+	MOTORS_Kazim  	= (real32_T	*)&paramAddr[n];	n += WORD(1);		// 0x20000008
+	CAMERA_HSV		= (int32_T  *)&paramAddr[n];	n += WORD(6);		// 0x2000000C
+	// 0x20000030
 
 } // END: InitParamAddr()
 
@@ -103,8 +105,9 @@ void InitParamAddr(void)
 void InitParamVal(void)
 {
 	// "motors" component
-	*MOTORS_Kpan  	= 0.14f;
-	*MOTORS_Ktilt  	= 0.13f;
+	*MOTORS_Kpan  	= 0.08f;
+	*MOTORS_Ktilt  	= 0.08f;
+	*MOTORS_Kazim  	= 0.15f;
 
 	// "camera" component
 	CAMERA_HSV[0] 	= 30;
@@ -114,31 +117,31 @@ void InitParamVal(void)
 	CAMERA_HSV[4] 	= 34;
 	CAMERA_HSV[5] 	= 255;
 
-	FILE *fd;
-	char *dest = (char *)PARAMS_ADDR;
-	char src[PARAMS_SIZE];
-
-	// check if the parameter file exists
-	if (access(paramFile, F_OK) < 0)
-	{
-		printf("%s does not exist.\n", paramFile);
-		return;
-	}
-
-	// Open the parameter files
-	fd = fopen(paramFile, "r");
-	if (fd == NULL)
-		fprintf(stderr, "Failed to open the parameter file\n");
-
-
-	// Read the parameters value
-	if (fread(src, 1, PARAMS_SIZE, fd) != PARAMS_SIZE)
-		fprintf(stderr, "Failed to read the parameter file\n");
-
-	// Copy the parameter values into a specific memory area
-	memcpy(dest, src, PARAMS_SIZE);
-
-	fclose(fd);
+//	FILE *fd;
+//	char *dest = (char *)PARAMS_ADDR;
+//	char src[PARAMS_SIZE];
+//
+//	// check if the parameter file exists
+//	if (access(paramFile, F_OK) < 0)
+//	{
+//		printf("%s does not exist.\n", paramFile);
+//		return;
+//	}
+//
+//	// Open the parameter files
+//	fd = fopen(paramFile, "r");
+//	if (fd == NULL)
+//		fprintf(stderr, "Failed to open the parameter file\n");
+//
+//
+//	// Read the parameters value
+//	if (fread(src, 1, PARAMS_SIZE, fd) != PARAMS_SIZE)
+//		fprintf(stderr, "Failed to read the parameter file\n");
+//
+//	// Copy the parameter values into a specific memory area
+//	memcpy(dest, src, PARAMS_SIZE);
+//
+//	fclose(fd);
 
 } // END: InitParamVal()
 

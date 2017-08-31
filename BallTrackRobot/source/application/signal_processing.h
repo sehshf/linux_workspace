@@ -31,6 +31,8 @@
  */
 #define MAX_AVERAGE_LENGTH	10
 
+#define NORMAL100			(100 * ((x) - (xmin)) / ((xmax) - (xmin)))
+
 /*
  * **************************************************
  * MACROS											*

@@ -49,6 +49,7 @@
 // "motors" component
 #define MOTORS_Kpan_C 		*MOTORS_Kpan
 #define MOTORS_Ktilt_C 		*MOTORS_Ktilt
+#define MOTORS_Kazim_C 		*MOTORS_Kazim
 
 
 // "camera" component
@@ -83,7 +84,7 @@
 // "motors" component
 extern real32_T *MOTORS_Kpan;
 extern real32_T *MOTORS_Ktilt;
-
+extern real32_T *MOTORS_Kazim;
 
 
 // "camera" component

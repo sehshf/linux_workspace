@@ -270,7 +270,7 @@ void FindBall(IplImage *img, targetObj_T *ball)
 real32_T BallArea(int32_T area)
 {
 	real32_T areaNorm, areaFilt;
-	static moveAvr_T areaObj = {.n = 10};
+	static moveAvr_T areaObj = {.n = 3};
 
 	// Normalize the signal to 0-100%
 	areaNorm    = (real32_T)(area - AREA_MIN) / (AREA_MAX - AREA_MIN) * 100;

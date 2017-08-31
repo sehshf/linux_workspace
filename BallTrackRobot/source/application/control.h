@@ -29,9 +29,6 @@
  * DEFINITIONS										*
  * **************************************************
  */
-// Scale to and unscale from [0 factor]
-#define SCALE(  x, xmin, xmax, factor)		((factor) * ((x) - (xmin)) / ((xmax) - (xmin)))
-#define UNSCALE(x, xmin, xmax, factor)		((x) * ((xmax) - (xmin)) / (factor) + (xmin))
 
 
 /*
@@ -56,8 +53,7 @@ typedef struct
 	uint16_T n ;		// derivative filter factor
 	real32_T I ; 		// integrator state updated inside PIDCtl()
 	real32_T D ;		// derivative state updated inside PIDCtl()
-	uint16_T y ;		// previous output  updated inside PIDCtl()
-	uint16_T scale;		// normalizing scale factor
+	real32_T y ;		// previous output  updated inside PIDCtl()
 } pid_T;
 
 

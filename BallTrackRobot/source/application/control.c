@@ -46,7 +46,7 @@
 *  -------------------------------------------------------  *
 *  FUNCTION:
 *      PIDCtl()
-*      Initializing the servo motors.
+*      Initializing servo motors.
 *
 *  Inputs:
 *  		*pid: pointer to a PID structure
@@ -61,24 +61,20 @@
 *  		   Apr 2017
 *  -------------------------------------------------------  *
 */
-uint16_T PIDCtl(pid_T *pid, uint16_T r, uint16_T y, real32_T ts)
+uint16_T PIDCtl(pid_T *pid, real32_T r, real32_T y, real32_T ts)
 {
-	real32_T err, dy, v;
-
+	real32_T e, dy;
 	real32_T P, I, D;
-
-	uint16_T u;
-
+	real32_T u, v;
 	real32_T Kd1, Kd2, Ki, Kt, Tt;
 
-	/* floating point error signal */
-	err = (real32_T)(r - y);
+	/* Error signal */
+	e = (r - y);
 
-	/* proportional part */
-	P = pid->k * err;
-//	printf("P = %f\n", P);
+	/* Proportional part */
+	P = pid->k * e;
 
-	/* derivative params */
+	/* Derivative params */
 	if (pid->td > 0)
 	{
 		Kd1 = pid->td / (pid->td + pid->n * ts);
@@ -90,31 +86,27 @@ uint16_T PIDCtl(pid_T *pid, uint16_T r, uint16_T y, real32_T ts)
 		Kd2 = 0;
 	}
 
-	/* integral part */
+	/* Integral part */
 	I = pid->I;
-//	printf("I = %f\n", I);
 
-	/* derivative parts */
-	dy = (real32_T)(y - pid->y);						// floating point output difference
+	/* Derivative parts */
+	dy = (y - pid->y);						// floating point output difference
 	D  = Kd1 * pid->D - Kd2 * dy;
 
-	/* parallel PID */
+	/* Parallel PID */
 	v = P + I + D;
-//	printf("v = %f\n", v);
-	u = SCALE(v, -pid->scale, pid->scale, pid->scale);
-//	printf("u = %d\n", u);
 
-	/* saturation filter */
-	u = sat(u, 0, pid->scale);
+	/* Saturation filter */
+	u = sat(v, 0, 100);
 
-	/* integrator params */
+	/* Integrator params */
 	if (pid->ti > 0)
 	{
 		Ki = pid->k * ts / (pid->ti);					// integrator gain
 
-		/* anti-windup params */
+		/* Anti-windup params */
 		if (pid->td > 0.1 * pid->ti)
-			Tt = sqrt((real32_T)(pid->ti * pid->td));	// anti-windup time
+			Tt = sqrt(pid->ti * pid->td);				// anti-windup time
 		else
 			Tt = 0.3 * pid->ti;							// anti-windup time
 
@@ -127,7 +119,7 @@ uint16_T PIDCtl(pid_T *pid, uint16_T r, uint16_T y, real32_T ts)
 	}
 
 	/* updates */
-	pid->I = I + Ki * err + Kt * ((real32_T)UNSCALE(u, -pid->scale, pid->scale, pid->scale) - v);	// integrator update including anti-windup
+	pid->I = I + Ki * e + Kt * (u - v);					// integrator update including anti-windup
 	pid->y = y;
 	pid->D = D;
 

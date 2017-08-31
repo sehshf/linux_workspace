@@ -44,6 +44,7 @@ cameraOutputs_T cameraOutputs = { .ball = {.detcd = FALSE, .area = 0, .x = 0, .y
  * **************************************************
  */
 void UpdateCameraOutputs(cameraOutputs_T *outputs);
+void CameraHandler(cameraOutputs_T *outputs);
 
 
 /*
@@ -69,17 +70,8 @@ void RunCamera(uint16_T period)
 {
 	static cameraOutputs_T outputs;
 
-	IplImage *img, *imgFild;
-
-	outputs.ball.detcd = FALSE;
-
-	img = cvQueryFrame(capture);
-
-	if (img != NULL)
-	{
-		imgFild  = FiltBall(img);
-		FindBall(imgFild, &(outputs.ball));
-	}
+	// Handle camera tasks
+	CameraHandler(&outputs);
 
 	// Update the component outputs
 	UpdateCameraOutputs(&outputs);
@@ -112,5 +104,36 @@ void UpdateCameraOutputs(cameraOutputs_T *outputs)
 	pthread_mutex_unlock(&(task[CAMERA_TASK].mutex));
 
 } // END: UpdateCameraOutputs()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      CAMERAHANDLER()
+*      Handle camera tasks.
+*
+*  Inputs:
+*      *outputs : Pointer to the output values
+*
+*  Author: Ehsan Shafiei
+*  		   Aug 2017
+*  -------------------------------------------------------  *
+*/
+void CameraHandler(cameraOutputs_T *outputs)
+{
+	IplImage *img, *imgFild;
+
+	outputs->ball.detcd = FALSE;
+
+	img = cvQueryFrame(capture);
+
+	if (img != NULL)
+	{
+		imgFild  = FiltBall(img);
+		FindBall(imgFild, &(outputs->ball));
+	}
+
+} // END: CameraHandler()
+
 
 // EOF: camera.c

@@ -25,6 +25,7 @@
 #include "rt_tasks.h"
 #include "motor_drive.h"
 #include "computer_vision.h"
+#include "control.h"
 #include "params.h"
 
 /*

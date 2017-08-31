@@ -39,8 +39,8 @@
 
 // Task period as multiplication of the baserate
 #define BASE_PERIOD			5		// 5 ms
-#define CAMERA_TASK_RATE	7
-#define MOTORS_TASK_RATE	7
+#define CAMERA_TASK_RATE	8
+#define MOTORS_TASK_RATE	8
 
 // Tasks enum should be ordered based on the tasks priorities
 enum
