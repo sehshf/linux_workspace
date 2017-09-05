@@ -46,7 +46,8 @@ struct timespec basePeriod;
 // Array of tasks function calls.
 // Should appear in the same order as of tasks enum
 void (*pTaskFcn[NUM_TASKS])(uint16_T period) = { RunCamera,
-												 RunMotors };
+												 RunServos,
+												 RunVehicle };
 
 
 /*
@@ -129,7 +130,8 @@ void InitRTTasks(uint16_T period[NUM_TASKS])
 
 	InitParamAddr();
 	InitParamVal();
-	InitMotors();
+	InitServos();
+	InitDCMotors();
 	InitCamera();
 
 	printf("Real-time tasks has been initialized.\n");

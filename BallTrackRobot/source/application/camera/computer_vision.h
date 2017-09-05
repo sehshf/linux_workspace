@@ -1,18 +1,25 @@
 /*
- * pca9685.h
+ * computer_vision.h
  *
- *  Created on: 22/10/2016
+ *  Created on: Feb 3, 2017
  *      Author: ses
  */
 
-#ifndef _PCA9685_H_
-#define _PCA9685_H_
+#ifndef _COMPUTER_VISION_H_
+#define _COMPUTER_VISION_H_
+
 
 /*
  * **************************************************
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
+#include <stdlib.h>
+#include <unistd.h>
+#include <cv.h>
+#include <highgui.h>
+#include <opencv2/opencv.hpp>
+#include <time.h>
 
 
 /*
@@ -20,61 +27,20 @@
  * APPLICATION INCLUDE FILES						*
  * **************************************************
  */
-#include "i2c_smbus.h"
+#include "portable.h"
+#include "common_defs.h"
+#include "params.h"
+#include "signal_processing.h"
+
 
 /*
  * **************************************************
  * DEFINITIONS										*
  * **************************************************
  */
-// Device specifics
-#define PCA9685_ADDR		0x40
-#define PCA9685_CLK			25000000
-#define PCA9685_COUNT		4096		// 12 bit count
+#define CV_SIZE_W   640
+#define CV_SIZE_H   480
 
-// PCA9685 registers
-#define MODE1				0x00
-#define MODE2				0x01
-
-#define LED0_ON_L 			0x06
-#define LED0_ON_H 			0x07
-#define LED0_OFF_L 			0x08
-#define LED0_OFF_H 			0x09
-
-#define ALL_LED_ON_L		0xFA
-#define ALL_LED_ON_H		0xFB
-#define ALL_LED_OFF_L		0xFC
-#define ALL_LED_OFF_H		0xFD
-#define PRE_SCALE			0xFE
-
-// Register bits
-#define PCA9685_OUTDRV		0x04
-#define PCA9685_ALLCALL 	0x01
-#define PCA9685_SLEEP   	0x10
-
-// Settings
-#define PWM_COUNT_DELAY		41		// 1% of total count (4096)
-
-// PWM outputs
-enum
-{
-	PWM_0,
-	PWM_1,
-	PWM_2,
-	PWM_3,
-	PWM_4,
-	PWM_5,
-	PWM_6,
-	PWM_7,
-	PWM_8,
-	PWM_9,
-	PWM_10,
-	PWM_11,
-	PWM_12,
-	PWM_13,
-	PWM_14,
-	PWM_15
-};
 
 /*
  * **************************************************
@@ -89,7 +55,25 @@ enum
  * TYPE DEFINITIONS									*
  * **************************************************
  */
-#define PWM_FREQ 			50
+// HSV filter
+enum
+{
+	H_MIN,
+	H_MAX,
+	S_MIN,
+	S_MAX,
+	V_MIN,
+	V_MAX,
+};
+
+// Target Object
+typedef struct
+{
+	boolean_T detcd;
+	int32_T area;
+	int32_T x;
+    int32_T y;
+} targetObj_T;
 
 
 /*
@@ -97,7 +81,7 @@ enum
  * External VARIABLES       						*
  * **************************************************
  */
-
+extern CvCapture *capture;
 
 
 
@@ -106,14 +90,20 @@ enum
  * PROTOTYPES										*
  * **************************************************
  */
-void SetPCAPulse(uint8_T channel, uint16_T pulse);
+void InitCamera(void);
+void ExitCamera(void);
 
-void SetPCAPWM(uint8_T channel, uint8_T duty);
+void TuneBallFilt(IplImage *img, int32_T x, int32_T y);
 
-void InitPWMChannels(void);
+IplImage *FiltBall(IplImage *img);
 
-#endif // _PCA9685_H_
+void FindBall(IplImage *img, targetObj_T *ball);
 
-// EOF: pca9685.h
+real32_T BallArea(int32_T area);
 
+loc_T BallLocation(int32_T x, int32_T y);
+
+#endif // _COMPUTER_VISION_H_
+
+// EOF: computer_vision.h
 

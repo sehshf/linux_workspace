@@ -21,14 +21,16 @@
 #include <time.h>
 #include <unistd.h>
 
+
 /*
  * **************************************************
  * APPLICATION INCLUDE FILES						*
  * **************************************************
  */
-#include "portable.h"
 #include "camera.h"
-#include "motors.h"
+#include "servo.h"
+#include "vehicle.h"
+#include "portable.h"
 
 /*
  * **************************************************
@@ -40,13 +42,15 @@
 // Task period as multiplication of the baserate
 #define BASE_PERIOD			5		// 5 ms
 #define CAMERA_TASK_RATE	8
-#define MOTORS_TASK_RATE	8
+#define SERVO_TASK_RATE		8
+#define VEHICLE_TASK_RATE	8
 
 // Tasks enum should be ordered based on the tasks priorities
 enum
 {
 	CAMERA_TASK,
-	MOTORS_TASK,
+	SERVO_TASK,
+	VEHICLE_TASK,
 	NUM_TASKS
 };
 

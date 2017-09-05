@@ -32,6 +32,10 @@ SOURCE 			= $(PROJECT)/source
 RELEASEDIR 		= $(PROJECT)/release
 BASIC			= $(SOURCE)/basic
 APPLICATION 	= $(SOURCE)/application
+APPLIB 			= $(APPLICATION)/applib/
+CAMERA 			= $(APPLICATION)/camera
+SERVO 			= $(APPLICATION)/servo
+VEHICLE			= $(APPLICATION)/vehicle
 TASKS 			= $(SOURCE)/tasks
 DATAIO 			= $(SOURCE)/dataio
 EXEDIR      	= $(RELEASEDIR)/exe
@@ -42,6 +46,10 @@ OPENCV 			= $(OPENCVINCLUDE)/opencv
 # define any directories containing header files other than /usr/include
 INCLUDES = 			\
 -I$(APPLICATION)	\
+-I$(APPLIB)			\
+-I$(CAMERA)			\
+-I$(SERVO)			\
+-I$(VEHICLE)		\
 -I$(BASIC)			\
 -I$(DATAIO)			\
 -I$(OPENCVINCLUDE) 	\
@@ -49,7 +57,7 @@ INCLUDES = 			\
 -I$(TASKS)			
 
 # Specify all paths of source files
-VPATH = $(BASIC) : $(APPLICATION) : $(TASKS) : $(DATAIO)
+VPATH = $(BASIC) : $(APPLICATION) : $(APPLIB) : $(CAMERA) : $(SERVO) : $(VEHICLE) : $(TASKS) : $(DATAIO)
 
 # define the C source files
 # Extract source directories
@@ -57,18 +65,21 @@ SRC_DIRS = $(subst :, ,$(VPATH))
 
 SRCS = 					\
 camera.c 				\
-common.c 				\
 computer_vision.c		\
 control.c				\
+dc_motors.c				\
 i2c_smbus.c				\
 gpio.c 					\
 main.c					\
-motor_drive.c       	\
-motors.c				\
 params.c				\
 pca9685.c				\
 rt_tasks.c				\
-signal_processing.c
+servo.c					\
+servo_control.c			\
+servo_motors.c			\
+signal_processing.c		\
+vehicle.c				\
+vehicle_control.c
 
 # define the C object files 
 #

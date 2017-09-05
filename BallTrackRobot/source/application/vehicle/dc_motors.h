@@ -1,12 +1,12 @@
 /*
- * pca9685.h
+ * dc_motors.h
  *
- *  Created on: 22/10/2016
+ *  Created on: Sep 2, 2017
  *      Author: ses
  */
 
-#ifndef _PCA9685_H_
-#define _PCA9685_H_
+#ifndef _DC_MOTORS_H_
+#define _DC_MOTORS_H_
 
 /*
  * **************************************************
@@ -20,61 +20,25 @@
  * APPLICATION INCLUDE FILES						*
  * **************************************************
  */
-#include "i2c_smbus.h"
+#include "pca9685.h"
+
 
 /*
  * **************************************************
  * DEFINITIONS										*
  * **************************************************
  */
-// Device specifics
-#define PCA9685_ADDR		0x40
-#define PCA9685_CLK			25000000
-#define PCA9685_COUNT		4096		// 12 bit count
+// Pulse defines in ms
+#define MOTOR_CCW			0
+#define MOTOR_CW		   	1
 
-// PCA9685 registers
-#define MODE1				0x00
-#define MODE2				0x01
+// DC motor IDs
+#define LEFT_MOTOR_CCW		PWM_4
+#define LEFT_MOTOR_CW		PWM_5
+#define RIGHT_MOTOR_CCW 	PWM_6
+#define RIGHT_MOTOR_CW 		PWM_7
 
-#define LED0_ON_L 			0x06
-#define LED0_ON_H 			0x07
-#define LED0_OFF_L 			0x08
-#define LED0_OFF_H 			0x09
-
-#define ALL_LED_ON_L		0xFA
-#define ALL_LED_ON_H		0xFB
-#define ALL_LED_OFF_L		0xFC
-#define ALL_LED_OFF_H		0xFD
-#define PRE_SCALE			0xFE
-
-// Register bits
-#define PCA9685_OUTDRV		0x04
-#define PCA9685_ALLCALL 	0x01
-#define PCA9685_SLEEP   	0x10
-
-// Settings
-#define PWM_COUNT_DELAY		41		// 1% of total count (4096)
-
-// PWM outputs
-enum
-{
-	PWM_0,
-	PWM_1,
-	PWM_2,
-	PWM_3,
-	PWM_4,
-	PWM_5,
-	PWM_6,
-	PWM_7,
-	PWM_8,
-	PWM_9,
-	PWM_10,
-	PWM_11,
-	PWM_12,
-	PWM_13,
-	PWM_14,
-	PWM_15
-};
+#define MOTOR_MIN_SPEED		10		// The minimum speed [%] required to start the rotation
 
 /*
  * **************************************************
@@ -89,7 +53,12 @@ enum
  * TYPE DEFINITIONS									*
  * **************************************************
  */
-#define PWM_FREQ 			50
+typedef struct
+{
+	uint8_T id[2];
+	int8_T  direction;
+	uint8_T speed;
+} dcMotor_T;
 
 
 /*
@@ -106,14 +75,10 @@ enum
  * PROTOTYPES										*
  * **************************************************
  */
-void SetPCAPulse(uint8_T channel, uint16_T pulse);
+void InitDCMotors(void);
 
-void SetPCAPWM(uint8_T channel, uint8_T duty);
+void DriveDCMotor(dcMotor_T *motor, int8_T direction, uint8_T speed);
 
-void InitPWMChannels(void);
+#endif // _DC_MOTORS_H_
 
-#endif // _PCA9685_H_
-
-// EOF: pca9685.h
-
-
+// EOF: dc_motors.h

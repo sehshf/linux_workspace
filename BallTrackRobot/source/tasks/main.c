@@ -27,7 +27,7 @@ int main()
 	struct sched_param schedParam;
 
 	// Task period as multiplication of the baserate
-	uint16_T period[NUM_TASKS] = {CAMERA_TASK_RATE, MOTORS_TASK_RATE};
+	uint16_T period[NUM_TASKS] = {CAMERA_TASK_RATE, SERVO_TASK_RATE, VEHICLE_TASK_RATE};
 
 	uint32_T i;
 

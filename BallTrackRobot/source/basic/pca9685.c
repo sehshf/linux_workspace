@@ -38,79 +38,14 @@ static uint16_T pcaFreq;
 static void InitOnOffReg(void);
 static void InitDeviceMode(void);
 static void DeviceWakeUp(void);
-
+static void SetupPCABoard(void);
+static void SetPCAFreq(uint16_T freq);
 
 /*
  * **************************************************
  * PUBLIC FUNCTIONS									*
  * **************************************************
  */
-
-/**
-*  -------------------------------------------------------  *
-*  FUNCTION:
-*      SETUPPCABOARD()
-*      Set up and initialize PCA9685.
-*
-*  Inputs:
-*
-*  Outputs:
-*
-*  Author: Ehsan Shafiei
-*  		   Oct 2016
-*  -------------------------------------------------------  *
-*/
-void SetupPCABoard(void)
-{
-	fd = AccessI2CBus((const char *)I2C_FILE, PCA9685_ADDR);
-	InitOnOffReg();
-	InitDeviceMode();
-	DeviceWakeUp();
-
-} // END: SetupPCABoard()
-
-
-/**
-*  -------------------------------------------------------  *
-*  FUNCTION:
-*      SETPCAFREQ()
-*      Set the PWN frequency of PCA9685.
-*
-*  Inputs:
-*      freq : Frequency [Hz] from 45 to 1526
-*
-*  Outputs:
-*
-*  Author: Ehsan Shafiei
-*  		   Oct 2016
-*  -------------------------------------------------------  *
-*/
-void SetPCAFreq(uint16_T freq)
-{
-	// Max: 1526 Hz
-	// Min: 45   Hz
-
-	uint8_T regVal, oldMode, newMode;
-
-	oldMode = SMBusRead8(fd);						// Read MODE1
-
-	newMode = (oldMode & 0x7F) | PCA9685_SLEEP;    	// Sleep mode
-	SMBusWrite8(fd, MODE1, newMode);
-
-	regVal = PCA9685_CLK / PCA9685_COUNT / freq - 1;
-	SMBusWrite8(fd, PRE_SCALE, (uint8_T)regVal);	// Set the PWM frequency
-
-	SMBusWrite8(fd, MODE1, oldMode);
-
-	usleep(500);									// Wait for the oscillator
-
-	SMBusWrite8(fd, MODE1, oldMode | 0x80);			// Restart all PWM channels
-
-	pcaFreq = freq;									// Update the frequency
-
-} // END: SetPCAFreq()
-
-
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
@@ -171,6 +106,35 @@ void SetPCAPWM(uint8_T channel, uint8_T duty)
 	SMBusWrite8(fd, LED0_OFF_H + 4 * channel, BYTE_H(offCnt));
 
 } // END: SetPCAPWM()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      INITPWMCHANNELS()
+*      Initializing the PCA board to drive the motors.
+*
+*  Inputs:
+*
+*  Outputs:
+*
+*  Author: Ehsan Shafiei
+*  		   Oct 2016, Sep 2017
+*  -------------------------------------------------------  *
+*/
+void InitPWMChannels(void)
+{
+	static boolean_T isInit = FALSE;
+
+	if (~isInit)
+	{
+		SetupPCABoard();
+		SetPCAFreq(PWM_FREQ);
+		isInit = TRUE;
+	}
+
+} // END: InitPWMChannels()
+
 
 /*
  * **************************************************
@@ -248,6 +212,71 @@ static void DeviceWakeUp(void)
 	usleep(500); 				// Wait for oscillator
 
 } // END: DeviceWakeUp()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      SETUPPCABOARD()
+*      Set up and initialize PCA9685.
+*
+*  Inputs:
+*
+*  Outputs:
+*
+*  Author: Ehsan Shafiei
+*  		   Oct 2016
+*  -------------------------------------------------------  *
+*/
+void SetupPCABoard(void)
+{
+	fd = AccessI2CBus((const char *)I2C_FILE, PCA9685_ADDR);
+	InitOnOffReg();
+	InitDeviceMode();
+	DeviceWakeUp();
+
+} // END: SetupPCABoard()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      SETPCAFREQ()
+*      Set the PWN frequency of PCA9685.
+*
+*  Inputs:
+*      freq : Frequency [Hz] from 45 to 1526
+*
+*  Outputs:
+*
+*  Author: Ehsan Shafiei
+*  		   Oct 2016
+*  -------------------------------------------------------  *
+*/
+void SetPCAFreq(uint16_T freq)
+{
+	// Max: 1526 Hz
+	// Min: 45   Hz
+
+	uint8_T regVal, oldMode, newMode;
+
+	oldMode = SMBusRead8(fd);						// Read MODE1
+
+	newMode = (oldMode & 0x7F) | PCA9685_SLEEP;    	// Sleep mode
+	SMBusWrite8(fd, MODE1, newMode);
+
+	regVal = PCA9685_CLK / PCA9685_COUNT / freq - 1;
+	SMBusWrite8(fd, PRE_SCALE, (uint8_T)regVal);	// Set the PWM frequency
+
+	SMBusWrite8(fd, MODE1, oldMode);
+
+	usleep(500);									// Wait for the oscillator
+
+	SMBusWrite8(fd, MODE1, oldMode | 0x80);			// Restart all PWM channels
+
+	pcaFreq = freq;									// Update the frequency
+
+} // END: SetPCAFreq()
 
 
 // EOF: pca9685.c
