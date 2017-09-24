@@ -31,8 +31,10 @@
  * **************************************************
  */
 #define POSITION_SP		10				// Vehicle position setpoint [%] (here is the percent of normalized ball area)
-#define DRIVE_FORWARD	MOTOR_CCW
-#define DRIVE_REAR		MOTOR_CW
+#define DRIVE_BACKWARD	0
+#define DRIVE_FORWARD	1
+#define TURN_RIGHT		2
+#define TURN_LEFT 		3
 
 
 

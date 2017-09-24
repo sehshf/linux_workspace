@@ -1,7 +1,7 @@
 /*
- * test_motor.c
+ * test_vehicle.c
  *
- *  Created on: Apr 11, 2017
+ *  Created on: Sep 24, 2017
  *      Author: ses
  */
 
@@ -16,7 +16,7 @@
 #include <time.h>
 
 #include "speed_sensor.h"
-#include "dc_motors.h"
+#include "vehicle_control.h"
 #include "portable.h"
 
 
@@ -24,12 +24,14 @@
 int main(int argc, char *argv[])
 {
 	uint8_T  speed;
-	int8_T   direction;
-	int32_T  leftSnsr;
+	uint8_T  sharpness;
+//	int32_T  leftSnsr;
 //	uint16_T rpm;
 
 	static dcMotor_T motorLeft  = {{LEFT_MOTOR_CW  , LEFT_MOTOR_CCW}, 1, 0};
 	static dcMotor_T motorRight = {{RIGHT_MOTOR_CCW, RIGHT_MOTOR_CW}, 1, 0};
+
+	real32_T lowerSpeed;
 
 	InitDCMotors();
 //	leftSnsr = InitSpeedSnsr(LEFT_WHEEL);
@@ -39,11 +41,16 @@ int main(int argc, char *argv[])
 		printf("Enter speed:\n");
 		scanf("%hhd", &speed);
 
-		printf("Enter direction:\n");
-		scanf("%hhd", &direction);
+		printf("Enter sharpness:\n");
+		scanf("%hhd", &sharpness);
 
-		DriveDCMotor(&motorLeft , (int8_T)direction, (uint8_T)speed);
-		DriveDCMotor(&motorRight, (int8_T)direction, (uint8_T)speed);
+		lowerSpeed = (real32_T)speed * (100 - sharpness) / 100;
+
+		if (lowerSpeed < MOTOR_MIN_SPEED)
+			lowerSpeed = 0;
+
+		DriveDCMotor(&motorLeft , (int8_T)DRIVE_BACKWARD, (uint8_T)speed);
+		DriveDCMotor(&motorRight, (int8_T)DRIVE_BACKWARD, (uint8_T)lowerSpeed);
 
 //		rpm = ReadSpeedSnsr(leftSnsr);
 //		printf("rpm = %d\n", rpm);
@@ -53,5 +60,5 @@ int main(int argc, char *argv[])
 
 } // END: main()
 
-// EOF: test_motor.c
+// EOF: test_vehicle .c
 

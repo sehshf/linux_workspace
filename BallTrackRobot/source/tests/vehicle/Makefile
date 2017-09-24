@@ -23,7 +23,7 @@ LIBS = -lm -lpthread -lrt
 #LIBS = -lmylib -lm
 
 # Output executable file
-OUTPUTFILE = TestMotor.elf
+OUTPUTFILE = TestVehicle.elf
 
 # Path
 PROJECT 	= /home/ses/workspace/BallTrackRobot
@@ -31,6 +31,7 @@ BASIC		= $(PROJECT)/source/basic
 APPLICATION = $(PROJECT)/source/application
 TEST 		= $(PROJECT)/source/tests
 VEHICLE		= $(APPLICATION)/vehicle
+APPLIB 		= $(APPLICATION)/applib
 RELEASEDIR  = $(TEST)/test_release
 EXEDIR      = $(RELEASEDIR)/exe
 OBJDIR      = $(RELEASEDIR)/obj
@@ -39,6 +40,7 @@ OBJDIR      = $(RELEASEDIR)/obj
 #
 INCLUDES =  	 	\
 -I$(APPLICATION) 	\
+-I$(APPLIB)			\
 -I$(BASIC)		 	\
 -I$(TEST)			\
 -I$(VEHICLE)
@@ -53,10 +55,10 @@ SRC_DIRS = $(subst :, ,$(VPATH))
 SRCS =  		\
 gpio.c			\
 i2c_smbus.c		\
-dc_motors.c	\
+dc_motors.c		\
 pca9685.c		\
 speed_sensor.c	\
-test_motor.c
+test_vehicle.c
 
 # define the C object files 
 #

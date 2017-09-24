@@ -28,13 +28,9 @@
  * DEFINITIONS										*
  * **************************************************
  */
-// Pulse defines in ms
-#define MOTOR_CCW			0
-#define MOTOR_CW		   	1
-
 // DC motor IDs
-#define LEFT_MOTOR_CCW		PWM_4
-#define LEFT_MOTOR_CW		PWM_5
+#define LEFT_MOTOR_CW		PWM_4
+#define LEFT_MOTOR_CCW		PWM_5
 #define RIGHT_MOTOR_CCW 	PWM_6
 #define RIGHT_MOTOR_CW 		PWM_7
 

@@ -86,7 +86,7 @@ void DriveDCMotor(dcMotor_T *motor, int8_T direction, uint8_T speed)
 {
 	if (direction != motor->direction)
 	{
-		SetPCAPWM(motor->id[direction], 0);
+		SetPCAPWM(motor->id[motor->direction], 0);
 		motor->speed = 0;
 	}
 
@@ -94,7 +94,7 @@ void DriveDCMotor(dcMotor_T *motor, int8_T direction, uint8_T speed)
 	if (speed > 0)
 		speed = max(speed, MOTOR_MIN_SPEED);
 
-	SetPCAPWM(motor->id[direction], 0);
+	SetPCAPWM(motor->id[direction], speed);
 
 	motor->direction = direction;
 	motor->speed 	 = speed;
