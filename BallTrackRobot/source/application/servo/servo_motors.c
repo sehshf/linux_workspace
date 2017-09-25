@@ -81,9 +81,21 @@ void InitServos(void)
 */
 void DriveServoInc(uint8_T motor, int8_T direction, int8_T degree)
 {
-    servoPos[motor] = servoPos[motor] + direction * degree;
-    servoPos[motor] = min(SERVO_POS_MAX, max(-SERVO_POS_MAX, servoPos[motor]));
-    DriveServoAbs(motor, servoPos[motor]);
+    uint8_T servo;
+
+    switch (motor)
+    {
+    case PAN_MOTOR:
+    	servo = PAN_SERVO;
+    	break;
+    case TILT_MOTOR:
+    	servo = TILT_SERVO;
+    	break;
+    }
+
+	servoPos[servo] = servoPos[servo] + direction * degree;
+    servoPos[servo] = sat(servoPos[servo], -SERVO_POS_MAX, SERVO_POS_MAX);
+    DriveServoAbs(motor, servoPos[servo]);
 
 } // END: DriveServoInc()
 
@@ -95,7 +107,7 @@ void DriveServoInc(uint8_T motor, int8_T direction, int8_T degree)
 *      Return the absolute position of the specified servo motor.
 *
 *  Inputs:
-*      motor : Specifies the servo motor.
+*      servo : Specifies the servo motor.
 *
 *  Outputs:
 *      servoPos : Position.
@@ -104,9 +116,9 @@ void DriveServoInc(uint8_T motor, int8_T direction, int8_T degree)
 *  		   Oct 2016
 *  -------------------------------------------------------  *
 */
-int8_T GetServoPos(uint8_T motor)
+int8_T GetServoPos(uint8_T servo)
 {
-	return servoPos[motor];
+	return servoPos[servo];
 
 } // END: GetServoPos()
 
@@ -135,10 +147,21 @@ int8_T GetServoPos(uint8_T motor)
 static void DriveServoAbs(uint8_T motor, int8_T degree)
 {
 	uint16_T pulse;
+    uint8_T servo;
+
+    switch (motor)
+    {
+    case PAN_MOTOR:
+    	servo = PAN_SERVO;
+    	break;
+    case TILT_MOTOR:
+    	servo = TILT_SERVO;
+    	break;
+    }
 
 	pulse = SERVO_PULSE_NEUT + degree * (SERVO_PULSE_MAX - SERVO_PULSE_MIN) / SERVO_POS_MAX / 2;	// pulse [ms]
 
-	servoPos[motor] = degree;		// Update position
+	servoPos[servo] = degree;		// Update position
 
 	SetPCAPulse(motor, pulse);
 

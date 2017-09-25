@@ -101,6 +101,7 @@ static void GetVehicleInputs(vehicleInputs_T *inputs)
 {
 	inputs->vision = cameraOutputs.ball.detcd;
 	inputs->vehPos = BallArea(cameraOutputs.ball.area);
+	inputs->panPos = servoOutputs.panPos;
 
 } // END: GetVehicleInputs()
 
@@ -120,7 +121,7 @@ static void GetVehicleInputs(vehicleInputs_T *inputs)
 */
 static void VehicleHandler(vehicleInputs_T *inputs)
 {
-	VehiclePositionControl(inputs->vision, inputs->vehPos);
+	VehiclePositionControl(inputs->vision, inputs->vehPos, inputs->panPos);
 
 } // END: VehicleHandler()
 

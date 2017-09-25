@@ -36,6 +36,12 @@ typedef struct
 	loc_T 		loc;
 } servoInputs_T;
 
+typedef struct
+{
+	int8_T panPos;
+	int8_T tiltPos;
+} servoOutputs_T;
+
 
 /*
  * **************************************************
@@ -58,7 +64,7 @@ typedef struct
  * External VARIABLES       						*
  * **************************************************
  */
-
+extern servoOutputs_T servoOutputs;
 
 
 

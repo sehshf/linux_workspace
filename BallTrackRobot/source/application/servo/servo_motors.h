@@ -35,11 +35,18 @@
 
 
 #define SERVO_POS_MAX		90
-#define SERVO_POS_MIN	   -90
-#define NUM_SERVOS 			2
 
+// Channel assignments
 #define PAN_MOTOR 			PWM_0
 #define TILT_MOTOR 			PWM_1
+
+// Servo enumerations
+enum
+{
+	PAN_SERVO,
+	TILT_SERVO,
+	NUM_SERVOS
+};
 
 /*
  * **************************************************
@@ -74,7 +81,7 @@ void InitServos(void);
 
 void DriveServoInc(uint8_T motor, int8_T direction, int8_T degree);
 
-int8_T GetServoPos(uint8_T motor);
+int8_T GetServoPos(uint8_T servo);
 
 
 #endif // _SERVO_MOTORS_H_

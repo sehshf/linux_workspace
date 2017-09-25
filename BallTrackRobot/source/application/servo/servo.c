@@ -26,7 +26,7 @@
  * GLOBAL VARIABLES (extern)						*
  * **************************************************
  */
-
+servoOutputs_T servoOutputs = {.panPos = 0, .tiltPos = 0};
 
 
 /*
@@ -43,7 +43,8 @@
  * **************************************************
  */
 static void GetServoInputs(servoInputs_T *inputs);
-static void ServoHandler(servoInputs_T *inputs);
+static void UpdateServoOutputs(servoOutputs_T *outputs);
+static void ServoHandler(servoInputs_T *inputs, servoOutputs_T *outputs);
 
 
 /*
@@ -68,12 +69,16 @@ static void ServoHandler(servoInputs_T *inputs);
 void RunServos(uint16_T period)
 {
 	servoInputs_T inputs;
+	static servoOutputs_T outputs;
 
 	// Get the servo component inputs
 	GetServoInputs(&inputs);
 
 	// Handle servo tasks
-	ServoHandler(&inputs);
+	ServoHandler(&inputs, &outputs);
+
+	// Update the component outputs
+	UpdateServoOutputs(&outputs);
 
 } // END: RunServos()
 
@@ -107,6 +112,28 @@ static void GetServoInputs(servoInputs_T *inputs)
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
+*      UPDATECAMEAOUTPUTS()
+*      Update the outputs of the "camera" component.
+*
+*  Inputs:
+*      *outputs : Pointer to the output values
+*
+*  Author: Ehsan Shafiei
+*  		   Apr 2017
+*  -------------------------------------------------------  *
+*/
+static void UpdateServoOutputs(servoOutputs_T *outputs)
+{
+	pthread_mutex_lock(&(task[CAMERA_TASK].mutex));
+	servoOutputs = *outputs;
+	pthread_mutex_unlock(&(task[CAMERA_TASK].mutex));
+
+} // END: UpdateCameraOutputs()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
 *      SERVOHANDLER()
 *      Handle servo tasks.
 *
@@ -117,9 +144,12 @@ static void GetServoInputs(servoInputs_T *inputs)
 *  		   Aug 2017
 *  -------------------------------------------------------  *
 */
-static void ServoHandler(servoInputs_T *inputs)
+static void ServoHandler(servoInputs_T *inputs, servoOutputs_T *outputs)
 {
 	ServoControl(inputs->vision, inputs->loc);
+
+	outputs->panPos  = GetServoPos(PAN_SERVO );
+	outputs->tiltPos = GetServoPos(TILT_SERVO);
 
 } // END: ServoHandler()
 

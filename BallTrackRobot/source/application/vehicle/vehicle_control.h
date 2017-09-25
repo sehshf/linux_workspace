@@ -22,6 +22,7 @@
  */
 #include "portable.h"
 #include "dc_motors.h"
+#include "servo_motors.h"
 #include "control.h"
 
 
@@ -31,10 +32,11 @@
  * **************************************************
  */
 #define POSITION_SP		10				// Vehicle position setpoint [%] (here is the percent of normalized ball area)
-#define DRIVE_BACKWARD	0
-#define DRIVE_FORWARD	1
-#define TURN_RIGHT		2
-#define TURN_LEFT 		3
+#define MOVE_BACKWARD	0
+#define MOVE_FORWARD	1
+#define MOVE_RIGHT		2
+#define MOVE_LEFT 		3
+#define MOVE_STRAIGHT   4
 
 
 
@@ -51,7 +53,13 @@
  * TYPE DEFINITIONS									*
  * **************************************************
  */
-
+typedef struct
+{
+	int8_T 	direction;	// Forward/Backward
+	int8_T 	side;		// Left/right
+	uint8_T speed;
+	uint8_T sharpness;	// Turning sharpness
+} movement_T;
 
 /*
  * **************************************************
@@ -67,7 +75,7 @@
  * PROTOTYPES										*
  * **************************************************
  */
-void VehiclePositionControl(boolean_T vision, real32_T pos);
+void VehiclePositionControl(boolean_T vision, real32_T pos, int8_T panPos);
 
 
 #endif // _VEHICLE_CONTROL_H_

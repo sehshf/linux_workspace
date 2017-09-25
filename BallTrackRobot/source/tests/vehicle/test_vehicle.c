@@ -49,8 +49,8 @@ int main(int argc, char *argv[])
 		if (lowerSpeed < MOTOR_MIN_SPEED)
 			lowerSpeed = 0;
 
-		DriveDCMotor(&motorLeft , (int8_T)DRIVE_BACKWARD, (uint8_T)speed);
-		DriveDCMotor(&motorRight, (int8_T)DRIVE_BACKWARD, (uint8_T)lowerSpeed);
+		DriveDCMotor(&motorLeft , (int8_T)MOVE_BACKWARD, (uint8_T)speed);
+		DriveDCMotor(&motorRight, (int8_T)MOVE_BACKWARD, (uint8_T)lowerSpeed);
 
 //		rpm = ReadSpeedSnsr(leftSnsr);
 //		printf("rpm = %d\n", rpm);

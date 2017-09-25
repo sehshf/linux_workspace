@@ -32,8 +32,7 @@
  * LOCAL PROTOTYPES									*
  * **************************************************
  */
-static void DriveStraight(int8_T direction, uint8_T speed);
-static void TurnVehicle(int8_T direction, uint8_T speed, int8_T side, uint8_T sharpness);
+static void DriveVehicle(movement_T *move);
 
 
 /*
@@ -57,18 +56,23 @@ static void TurnVehicle(int8_T direction, uint8_T speed, int8_T side, uint8_T sh
 *  		   Sep 2017
 *  -------------------------------------------------------  *
 */
-void VehiclePositionControl(boolean_T vision, real32_T pos)
+void VehiclePositionControl(boolean_T vision, real32_T pos, int8_T panPos)
 {
-	const static int32_T  POS_HYS = 2;
+	const static int32_T POS_HYS = 2;
+	const static int8_t  PAN_HYS = 5;
 
 
 	static pid_T pid;
 
-	pid.k 	 = 0.25;
+	pid.k 	 = 0.5;
 	pid.ti 	 = 10;
 
 	real32_T  u, ePos;
-	uint8_T   speed = 0, direction = DRIVE_FORWARD;
+
+	static movement_T move = { .direction = MOVE_FORWARD,
+							   .side 	  = MOVE_STRAIGHT,
+							   .speed 	  = 0,
+							   .sharpness = 0 };
 
 	if (vision)
 		ePos	= POSITION_SP - pos;
@@ -82,19 +86,40 @@ void VehiclePositionControl(boolean_T vision, real32_T pos)
 		u = PIDControl(&pid, POSITION_SP, pos, 0.04);
 
 		if (GETSIGN(u) > 0)
-			direction = DRIVE_FORWARD;
+			move.direction = MOVE_FORWARD;
 		else
-			direction = DRIVE_BACKWARD;
+			move.direction = MOVE_BACKWARD;
 
-		speed = abs(u);
+		if (panPos < -PAN_HYS)
+		{
+			if (GETSIGN(u) > 0)
+				move.side = MOVE_RIGHT;
+			else
+				move.side = MOVE_LEFT;
+		}
+		else if (panPos > PAN_HYS)
+		{
+			if (GETSIGN(u) > 0)
+				move.side = MOVE_LEFT;
+			else
+				move.side = MOVE_RIGHT;
+		}
+		else
+		{
+			move.side = MOVE_STRAIGHT;
+		}
+
+		move.speed = abs(u);
+
+		move.sharpness = (int32_T)abs(panPos) * 100 / SERVO_POS_MAX;
 	}
 	else
 	{
-		speed = 0;
+		move.speed = 0;
 		pid.I = 0;
 	}
 
-	DriveStraight(direction, speed);
+	DriveVehicle(&move);
 
 } // END: VehiclePositionControl()
 
@@ -104,34 +129,6 @@ void VehiclePositionControl(boolean_T vision, real32_T pos)
  * LOCAL FUNCTIONS									*
  * **************************************************
  */
-/**
-*  -------------------------------------------------------  *
-*  FUNCTION:
-*      PUBLICFUCTION()
-*      Drive vehicle straight.
-*
-*  Inputs:
-*      direction: Drive direction (forward or rear)
-*      speed	: Motor speed [%], range [MOTOR_MIN_SPEED 100]
-*
-*  Outputs:
-*      y : Return 0 when succeeded.
-*
-*  Author: Ehsan Shafiei
-*  		   Aug 2016
-*  -------------------------------------------------------  *
-*/
-static void DriveStraight(int8_T direction, uint8_T speed)
-{
-	static dcMotor_T leftMotor  = {{LEFT_MOTOR_CW  , LEFT_MOTOR_CCW}, DRIVE_FORWARD, 0};
-	static dcMotor_T rightMotor = {{RIGHT_MOTOR_CCW, RIGHT_MOTOR_CW}, DRIVE_FORWARD, 0};
-
-	DriveDCMotor(&leftMotor , direction, speed);
-	DriveDCMotor(&rightMotor, direction, speed);
-
-} // END: DriveStraight()
-
-
 /*
  * **************************************************
  * LOCAL FUNCTIONS									*
@@ -154,32 +151,35 @@ static void DriveStraight(int8_T direction, uint8_T speed)
 *  		   Aug 2016
 *  -------------------------------------------------------  *
 */
-static void TurnVehicle(int8_T direction, uint8_T speed, int8_T side, uint8_T sharpness)
+static void DriveVehicle(movement_T *move)
 {
-	static dcMotor_T leftMotor  = {{LEFT_MOTOR_CW  , LEFT_MOTOR_CCW}, DRIVE_FORWARD, 0};
-	static dcMotor_T rightMotor = {{RIGHT_MOTOR_CCW, RIGHT_MOTOR_CW}, DRIVE_FORWARD, 0};
+	static dcMotor_T leftMotor  = {{LEFT_MOTOR_CW  , LEFT_MOTOR_CCW}, MOVE_FORWARD, 0};
+	static dcMotor_T rightMotor = {{RIGHT_MOTOR_CCW, RIGHT_MOTOR_CW}, MOVE_FORWARD, 0};
 
 	real32_T lowerSpeed;
 
-	lowerSpeed = (real32_T)speed * (100 - sharpness) / 100;
+	lowerSpeed = (real32_T)move->speed * (100 - move->sharpness) / 100;
 
 	if (lowerSpeed < MOTOR_MIN_SPEED)
 		lowerSpeed = 0;
 
-	if (side == TURN_RIGHT)
+	if (move->side == MOVE_RIGHT)
 	{
-		DriveDCMotor(&leftMotor , direction, speed);
-		DriveDCMotor(&rightMotor, direction, (uint8_T)lowerSpeed);
+		DriveDCMotor(&leftMotor , move->direction, move->speed);
+		DriveDCMotor(&rightMotor, move->direction, (uint8_T)lowerSpeed);
 	}
-	else if (side == TURN_LEFT)
+	else if (move->side == MOVE_LEFT)
 	{
-		DriveDCMotor(&leftMotor , direction, (uint8_T)lowerSpeed);
-		DriveDCMotor(&rightMotor, direction, speed);
+		DriveDCMotor(&leftMotor , move->direction, (uint8_T)lowerSpeed);
+		DriveDCMotor(&rightMotor, move->direction, move->speed);
 	}
 	else
-		fprintf(stderr, "Wrong turn side.\n");
+	{
+		DriveDCMotor(&leftMotor , move->direction, move->speed);
+		DriveDCMotor(&rightMotor, move->direction, move->speed);
+	}
 
-} // END: TurnVehicle()
+} // END: DriveVehicle()
 
 
 // EOF: vehicle_control .c

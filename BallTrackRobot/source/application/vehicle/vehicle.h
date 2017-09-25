@@ -22,6 +22,7 @@
  * **************************************************
  */
 #include "camera.h"
+#include "servo.h"
 #include "params.h"
 #include "vehicle_control.h"
 #include "rt_tasks.h"
@@ -35,6 +36,7 @@ typedef struct
 {
 	boolean_T	vision;
 	real32_T 	vehPos;
+	int8_T		panPos;
 } vehicleInputs_T;
 
 
