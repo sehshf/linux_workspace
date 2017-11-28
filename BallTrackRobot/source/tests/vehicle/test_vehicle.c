@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "speed_sensor.h"
+#include "wheel.h"
 #include "vehicle_control.h"
 #include "portable.h"
 
@@ -28,29 +28,27 @@ int main(int argc, char *argv[])
 //	int32_T  leftSnsr;
 //	uint16_T rpm;
 
-	static dcMotor_T motorLeft  = {{LEFT_MOTOR_CW  , LEFT_MOTOR_CCW}, 1, 0};
-	static dcMotor_T motorRight = {{RIGHT_MOTOR_CCW, RIGHT_MOTOR_CW}, 1, 0};
+	static wheel_T leftWheel  = {LEFT_WHEEL , FORWARD_DIRECTION};
+	static wheel_T rightWheel = {RIGHT_WHEEL, FORWARD_DIRECTION};
 
 	real32_T lowerSpeed;
 
-	InitDCMotors();
-//	leftSnsr = InitSpeedSnsr(LEFT_WHEEL);
+	InitWheels();
 
 	while(1)
     {
 		printf("Enter speed:\n");
 		scanf("%hhd", &speed);
 
-		printf("Enter sharpness:\n");
-		scanf("%hhd", &sharpness);
+//		printf("Enter sharpness:\n");
+//		scanf("%hhd", &sharpness);
 
-		lowerSpeed = (real32_T)speed * (100 - sharpness) / 100;
-
-		if (lowerSpeed < MOTOR_MIN_SPEED)
-			lowerSpeed = 0;
-
-		DriveDCMotor(&motorLeft , (int8_T)MOVE_BACKWARD, (uint8_T)speed);
-		DriveDCMotor(&motorRight, (int8_T)MOVE_BACKWARD, (uint8_T)lowerSpeed);
+		for (int i = 0; i < 3; i++)
+		{
+			DriveWheel(&leftWheel, speed);
+			DriveWheel(&rightWheel, speed);
+			usleep(200000);
+		}
 
 //		rpm = ReadSpeedSnsr(leftSnsr);
 //		printf("rpm = %d\n", rpm);

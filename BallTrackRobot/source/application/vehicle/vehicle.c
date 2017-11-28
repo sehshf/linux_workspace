@@ -55,6 +55,27 @@ static void VehicleHandler(vehicleInputs_T *inputs);
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
+*      INITVEHICLE()
+*      Run vehicle task.
+*
+*  Inputs:
+*
+*  Outputs:
+*
+*  Author: Ehsan Shafiei
+*		   Apr 2017
+*  -------------------------------------------------------  *
+*/
+void InitVehicle(void)
+{
+	InitWheels();
+
+} // END: InitVehicle()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
 *      RUNVEHICLE()
 *      Run vehicle task.
 *

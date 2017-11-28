@@ -1,18 +1,19 @@
 /*
- * dc_motors.h
+ * wheel.h
  *
- *  Created on: Sep 2, 2017
+ *  Created on: Oct 29, 2017
  *      Author: ses
  */
 
-#ifndef _DC_MOTORS_H_
-#define _DC_MOTORS_H_
+#ifndef _WHEEL_H_
+#define _WHEEL_H_
 
 /*
  * **************************************************
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
+#include <pthread.h>
 
 
 /*
@@ -20,8 +21,7 @@
  * APPLICATION INCLUDE FILES						*
  * **************************************************
  */
-#include "common_defs.h"
-#include "pca9685.h"
+#include "dc_motors.h"
 #include "speed_sensor.h"
 
 
@@ -30,19 +30,17 @@
  * DEFINITIONS										*
  * **************************************************
  */
-// DC motor channels
-#define LEFT_MOTOR_CW		PWM_4
-#define LEFT_MOTOR_CCW		PWM_5
-#define RIGHT_MOTOR_CCW 	PWM_6
-#define RIGHT_MOTOR_CW 		PWM_7
+#define WHEEL_MIN_SPEED		10		// The minimum speed [%] required to overcome the static friction
+#define WHEEL_STEP_SPEED	20		// Wheel speed in step drive mode (speed between the steps)
 
-// DC motors enumeration
+// Wheel enumeration
 enum
 {
-	LEFT_DCMOTOR,
-	RIGHT_DCMOTOR,
-	NUM_DCMOTOR
+	LEFT_WHEEL,
+	RIGHT_WHEEL,
+	NUM_WHEEL
 };
+
 
 /*
  * **************************************************
@@ -57,7 +55,14 @@ enum
  * TYPE DEFINITIONS									*
  * **************************************************
  */
-
+typedef struct
+{
+	uint8_T id;			// Wheel ID (left or right)
+	int8_T 	direction;
+	uint8_T motor;
+	uint8_T sensor;
+	uint8_T steps;		// Assigned number of steps when running in the step mode
+} wheel_T;
 
 
 /*
@@ -74,10 +79,12 @@ enum
  * PROTOTYPES										*
  * **************************************************
  */
-void InitDCMotors(void);
+void InitWheels(void);
+void DriveWheel(wheel_T *wheel, int8_T direction, uint8_T speed);
 
-void DriveDCMotor(uint8_T motor, int8_T direction, uint8_T speed);
 
-#endif // _DC_MOTORS_H_
+#endif // _WHEEL_H_
 
-// EOF: dc_motors.h
+// EOF: wheel.h
+
+

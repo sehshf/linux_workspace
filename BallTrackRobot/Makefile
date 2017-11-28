@@ -78,8 +78,10 @@ servo.c					\
 servo_control.c			\
 servo_motors.c			\
 signal_processing.c		\
+speed_sensor.c			\
 vehicle.c				\
-vehicle_control.c
+vehicle_control.c		\
+wheel.c
 
 # define the C object files 
 #

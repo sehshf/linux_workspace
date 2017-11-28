@@ -25,14 +25,14 @@ int main(int argc, char *argv[])
 {
 	uint8_T  speed;
 	int8_T   direction;
-	int32_T  leftSnsr;
+
 //	uint16_T rpm;
 
 	static dcMotor_T motorLeft  = {{LEFT_MOTOR_CW  , LEFT_MOTOR_CCW}, 1, 0};
 	static dcMotor_T motorRight = {{RIGHT_MOTOR_CCW, RIGHT_MOTOR_CW}, 1, 0};
 
 	InitDCMotors();
-//	leftSnsr = InitSpeedSnsr(LEFT_WHEEL);
+	InitWheelSnsrs();
 
 	while(1)
     {

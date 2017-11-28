@@ -49,6 +49,7 @@ static void DriveVehicle(movement_T *move);
 *  Inputs:
 *  		vision: vision status
 *  		pos	  : current position [%]
+*  		panPos: Pan servo position in degree -90 to 90
 *
 *  Outputs:
 *
@@ -59,18 +60,18 @@ static void DriveVehicle(movement_T *move);
 void VehiclePositionControl(boolean_T vision, real32_T pos, int8_T panPos)
 {
 	const static int32_T POS_HYS = 2;
-	const static int8_t  PAN_HYS = 5;
+	const static int8_t  PAN_HYS = 10;
 
 
 	static pid_T pid;
 
-	pid.k 	 = 0.5;
-	pid.ti 	 = 10;
+	pid.k 	 = 0.15;
+	pid.ti 	 = 8;
 
 	real32_T  u, ePos;
 
-	static movement_T move = { .direction = MOVE_FORWARD,
-							   .side 	  = MOVE_STRAIGHT,
+	static movement_T move = { .direction = FORWARD_DIRECTION,
+							   .turn 	  = MOVE_STRAIGHT,
 							   .speed 	  = 0,
 							   .sharpness = 0 };
 
@@ -79,34 +80,32 @@ void VehiclePositionControl(boolean_T vision, real32_T pos, int8_T panPos)
 	else
 		ePos = 0;
 
-
 	if (abs(ePos) > POS_HYS)
-//		speed = MOTORS_Kazim_C * abs(eAzim) + SPEED_BIAS;
 	{
-		u = PIDControl(&pid, POSITION_SP, pos, 0.04);
+		u = PIDControl(&pid, POSITION_SP, pos, 0.2);
 
 		if (GETSIGN(u) > 0)
-			move.direction = MOVE_FORWARD;
+			move.direction = FORWARD_DIRECTION;
 		else
-			move.direction = MOVE_BACKWARD;
+			move.direction = BACKWARD_DIRECTION;
 
 		if (panPos < -PAN_HYS)
 		{
 			if (GETSIGN(u) > 0)
-				move.side = MOVE_RIGHT;
+				move.turn = MOVE_RIGHT;
 			else
-				move.side = MOVE_LEFT;
+				move.turn = MOVE_LEFT;
 		}
 		else if (panPos > PAN_HYS)
 		{
 			if (GETSIGN(u) > 0)
-				move.side = MOVE_LEFT;
+				move.turn = MOVE_LEFT;
 			else
-				move.side = MOVE_RIGHT;
+				move.turn = MOVE_RIGHT;
 		}
 		else
 		{
-			move.side = MOVE_STRAIGHT;
+			move.turn = MOVE_STRAIGHT;
 		}
 
 		move.speed = abs(u);
@@ -129,54 +128,46 @@ void VehiclePositionControl(boolean_T vision, real32_T pos, int8_T panPos)
  * LOCAL FUNCTIONS									*
  * **************************************************
  */
-/*
- * **************************************************
- * LOCAL FUNCTIONS									*
- * **************************************************
- */
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      PUBLICFUCTION()
-*      Drive vehicle straight.
+*      DRIVEVEHICLE()
+*      Drive vehicle with the specified direction,
+*      side, speed and sharpness of the turn.
 *
 *  Inputs:
-*      direction: Drive direction (forward or rear)
-*      speed	: Motor speed [%], range [MOTOR_MIN_SPEED 100]
+*      *move : *pointer to the movement object
 *
 *  Outputs:
-*      y : Return 0 when succeeded.
 *
 *  Author: Ehsan Shafiei
-*  		   Aug 2016
+*  		   Sep 2017
 *  -------------------------------------------------------  *
 */
 static void DriveVehicle(movement_T *move)
 {
-	static dcMotor_T leftMotor  = {{LEFT_MOTOR_CW  , LEFT_MOTOR_CCW}, MOVE_FORWARD, 0};
-	static dcMotor_T rightMotor = {{RIGHT_MOTOR_CCW, RIGHT_MOTOR_CW}, MOVE_FORWARD, 0};
+	static wheel_T leftWheel  = {LEFT_WHEEL , FORWARD_DIRECTION, 0};
+	static wheel_T rightWheel = {RIGHT_WHEEL, FORWARD_DIRECTION, 0};
 
 	real32_T lowerSpeed;
 
+	// Lower speed of the wheel associated with the turning side
 	lowerSpeed = (real32_T)move->speed * (100 - move->sharpness) / 100;
 
-	if (lowerSpeed < MOTOR_MIN_SPEED)
-		lowerSpeed = 0;
-
-	if (move->side == MOVE_RIGHT)
+	if (move->turn == MOVE_RIGHT)
 	{
-		DriveDCMotor(&leftMotor , move->direction, move->speed);
-		DriveDCMotor(&rightMotor, move->direction, (uint8_T)lowerSpeed);
+		DriveWheel(&leftWheel , move->direction, move->speed);
+		DriveWheel(&rightWheel, move->direction, (uint8_T)lowerSpeed);
 	}
-	else if (move->side == MOVE_LEFT)
+	else if (move->turn == MOVE_LEFT)
 	{
-		DriveDCMotor(&leftMotor , move->direction, (uint8_T)lowerSpeed);
-		DriveDCMotor(&rightMotor, move->direction, move->speed);
+		DriveWheel(&leftWheel , move->direction, (uint8_T)lowerSpeed);
+		DriveWheel(&rightWheel, move->direction, move->speed);
 	}
 	else
 	{
-		DriveDCMotor(&leftMotor , move->direction, move->speed);
-		DriveDCMotor(&rightMotor, move->direction, move->speed);
+		DriveWheel(&leftWheel , move->direction, move->speed);
+		DriveWheel(&rightWheel, move->direction, move->speed);
 	}
 
 } // END: DriveVehicle()

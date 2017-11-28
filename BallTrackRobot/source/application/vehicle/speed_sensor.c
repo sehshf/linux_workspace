@@ -34,7 +34,8 @@
  * LOCAL PROTOTYPES									*
  * **************************************************
  */
-
+// File descriptor for speed sensors
+static int32_T fdSpeedSnsr[NUM_SPEED_SNSR];
 
 
 /*
@@ -46,26 +47,25 @@
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      INITSPEEDSNSR()
-*      Initializing speed sensor (rotary encoder).
+*      INITSPEEDSNSRS()
+*      Initializing speed sensors (rotary encoder).
 *
 *  Inputs:
-*  		pin : GPIO pin for reading the sensor pulses
-*
+*  		*
 *  Outputs:
-*  		fd  : SYSFS GPIO value file descriptor
 *
 *  Author: Ehsan Shafiei
 *  		   May 2017
 *  -------------------------------------------------------  *
 */
-int32_T InitSpeedSnsr(uint8_T pin)
+void InitSpeedSnsrs(void)
 {
 	sysGPIO_T 	gpio;
-	int32_T	  	fd;
+
+	/* Initialize left speed sensor */
 
 	// Setting for the GPIO pin
-	gpio.pin  		= pin;
+	gpio.pin  		= LEFT_SPEED_SENSOR_PIN;
 	gpio.direction	= SYS_GPIO_IN;
 	gpio.trigger 	= SYS_GPIO_FALLING;
 	gpio.actvLow	= TRUE;
@@ -74,11 +74,24 @@ int32_T InitSpeedSnsr(uint8_T pin)
 	ConfigSysGPIO(&gpio);
 
 	// Open GPIO port
-	fd = OpenSysGPIO(pin);
+	fdSpeedSnsr[LEFT_SPEED_SNSR] = OpenSysGPIO(LEFT_SPEED_SENSOR_PIN);
 
-	return fd;
 
-} // END: InitSpeedSnsr()
+	/* Initialize right speed sensor */
+
+	// Setting for the GPIO pin
+	gpio.pin  		= RIGHT_SPEED_SENSOR_PIN;
+	gpio.direction	= SYS_GPIO_IN;
+	gpio.trigger 	= SYS_GPIO_FALLING;
+	gpio.actvLow	= TRUE;
+
+	// Apply the GPIO setting
+	ConfigSysGPIO(&gpio);
+
+	// Open GPIO port
+	fdSpeedSnsr[RIGHT_SPEED_SNSR] = OpenSysGPIO(LEFT_SPEED_SENSOR_PIN);
+
+} // END: InitSpeedSnsrs()
 
 
 /**
@@ -88,7 +101,7 @@ int32_T InitSpeedSnsr(uint8_T pin)
 *      Calculating rpm from the speed sensor.
 *
 *  Inputs:
-*      sensor : descriptor of the opened value file.
+*      sensor : speed sensor (left or right).
 *
 *  Outputs:
 *      rpm : speed [rpm].
@@ -97,7 +110,7 @@ int32_T InitSpeedSnsr(uint8_T pin)
 *  		   May 2017
 *  -------------------------------------------------------  *
 */
-uint16_T ReadSpeedSnsr(int32_T sensor)
+uint16_T ReadSpeedSnsr(uint8_T sensor)
 {
 	int8_T	 gpioVal;
 	uint16_T cnt = 0, rpm = 0;
@@ -109,7 +122,7 @@ uint16_T ReadSpeedSnsr(int32_T sensor)
 	while (1)
 	{
 		// This is a blocking read
-		gpioVal = ReadSysGPIO(sensor, WHEEL_STOP_TIME);
+		gpioVal = ReadSysGPIO(fdSpeedSnsr[sensor], SPEED_STOP_TIME);
 
 		if (gpioVal == TRUE)
 			cnt++;
@@ -135,6 +148,42 @@ uint16_T ReadSpeedSnsr(int32_T sensor)
 	}
 
 } // END: ReadSpeedSnsr()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      READSPEEDPULSE()
+*      Reading one complete encoder pulse.
+*
+*  Inputs:
+*      sensor : descriptor of the opened value file.
+*
+*  Outputs:
+*      pulse : returns the read status.
+*
+*  Author: Ehsan Shafiei
+*  		   Oct 2017
+*  -------------------------------------------------------  *
+*/
+boolean_T ReadSpeedPulse(uint8_T sensor)
+{
+	uint8_T i, cnt = 0;
+
+	boolean_T pulse = FALSE;
+
+	for (i = 0; i < 2; i++)
+	{
+		// This is a blocking read
+		if (ReadSysGPIO(fdSpeedSnsr[sensor], SPEED_STOP_TIME) != -1)
+			cnt++;
+	}
+	if (cnt == 2)
+		pulse = TRUE;
+
+	return pulse;
+
+} // END: ReadSpeedPulse()
 
 
 /*

@@ -27,7 +27,7 @@ CvCapture *capture;
  * **************************************************
  */
 // Minimum and maximum object area for the ball
-static const int32_T AREA_MIN = 60 * 60;
+static const int32_T AREA_MIN = 30 * 30;
 static const int32_T AREA_MAX = 350 * 350;
 
 
@@ -60,7 +60,8 @@ static const int32_T AREA_MAX = 350 * 350;
 */
 void InitCamera(void)
 {
-	IplImage *img;
+	IplImage *img = NULL;
+	int32_T i;
 
 	system("sudo modprobe bcm2835-v4l2");
 	usleep(50000);
@@ -70,8 +71,16 @@ void InitCamera(void)
 
 	// First run of FiltBall() takes longer time
 	// so that it is used in the initialization
-	img = cvQueryFrame(capture);
-	FiltBall(img);
+	for (i = 0; i < 3; i++)
+	{
+		img = cvQueryFrame(capture);
+		if (img != NULL)
+			break;
+	}
+	if (img != NULL)
+		FiltBall(img);
+	else
+		fprintf(stderr, "Initial image capture failed.\n");
 
 } // END: InitCamera()
 

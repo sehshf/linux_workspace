@@ -113,13 +113,13 @@ static void GetServoInputs(servoInputs_T *inputs)
 *  -------------------------------------------------------  *
 *  FUNCTION:
 *      UPDATECAMEAOUTPUTS()
-*      Update the outputs of the "camera" component.
+*      Update the outputs of the "servo" component.
 *
 *  Inputs:
 *      *outputs : Pointer to the output values
 *
 *  Author: Ehsan Shafiei
-*  		   Apr 2017
+*  		   Sep 2017
 *  -------------------------------------------------------  *
 */
 static void UpdateServoOutputs(servoOutputs_T *outputs)
@@ -139,6 +139,7 @@ static void UpdateServoOutputs(servoOutputs_T *outputs)
 *
 *  Inputs:
 *      *inputs : Pointer to the input values
+*      *output : Pointer to the output values
 *
 *  Author: Ehsan Shafiei
 *  		   Aug 2017

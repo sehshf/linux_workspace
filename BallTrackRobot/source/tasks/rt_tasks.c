@@ -131,7 +131,7 @@ void InitRTTasks(uint16_T period[NUM_TASKS])
 	InitParamAddr();
 	InitParamVal();
 	InitServos();
-	InitDCMotors();
+	InitVehicle();
 	InitCamera();
 
 	printf("Real-time tasks has been initialized.\n");

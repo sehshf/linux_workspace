@@ -43,7 +43,7 @@
 #define BASE_PERIOD			5		// 5 ms
 #define CAMERA_TASK_RATE	8
 #define SERVO_TASK_RATE		8
-#define VEHICLE_TASK_RATE	8
+#define VEHICLE_TASK_RATE	40
 
 // Tasks enum should be ordered based on the tasks priorities
 enum

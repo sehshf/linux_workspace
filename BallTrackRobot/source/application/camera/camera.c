@@ -121,7 +121,7 @@ static void UpdateCameraOutputs(cameraOutputs_T *outputs)
 */
 static void CameraHandler(cameraOutputs_T *outputs)
 {
-	IplImage *img, *imgFild;
+	IplImage *img = NULL, *imgFild;
 
 	outputs->ball.detcd = FALSE;
 

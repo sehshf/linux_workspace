@@ -32,6 +32,7 @@ APPLICATION = $(PROJECT)/source/application
 TEST 		= $(PROJECT)/source/tests
 VEHICLE		= $(APPLICATION)/vehicle
 APPLIB 		= $(APPLICATION)/applib
+SERVO		= $(APPLICATION)/servo
 RELEASEDIR  = $(TEST)/test_release
 EXEDIR      = $(RELEASEDIR)/exe
 OBJDIR      = $(RELEASEDIR)/obj
@@ -42,11 +43,12 @@ INCLUDES =  	 	\
 -I$(APPLICATION) 	\
 -I$(APPLIB)			\
 -I$(BASIC)		 	\
+-I$(SERVO)			\
 -I$(TEST)			\
 -I$(VEHICLE)
 
 # Specify all paths of source files
-VPATH = $(APPLICATION) : $(BASIC) : $(TEST) : $(VEHICLE)
+VPATH = $(APPLICATION) : $(BASIC) : $(TEST) : $(VEHICLE) : $(SERVO)
 
 # define the C source files
 # Extract source directories
@@ -57,8 +59,10 @@ gpio.c			\
 i2c_smbus.c		\
 dc_motors.c		\
 pca9685.c		\
+servo_motors.c	\
 speed_sensor.c	\
-test_vehicle.c
+test_vehicle.c	\
+wheel.c
 
 # define the C object files 
 #

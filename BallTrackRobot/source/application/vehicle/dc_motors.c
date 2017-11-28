@@ -72,32 +72,33 @@ void InitDCMotors(void)
 *
 *  Inputs:
 *      motor    : Specifies the DC motor.
-*      direction: Rotation direction
+*      direction: Movement direction
 *      speed	: Motor speed [%], range [MOTOR_MIN_SPEED 100]
 *
 *  Outputs:
 *      servoPos : Position.
 *
 *  Author: Ehsan Shafiei
-*  		   Apr 2017
+*  		   Nov 2017
 *  -------------------------------------------------------  *
 */
-void DriveDCMotor(dcMotor_T *motor, int8_T direction, uint8_T speed)
+void DriveDCMotor(uint8_T motor, int8_T direction, uint8_T speed)
 {
-	if (direction != motor->direction)
-	{
-		SetPCAPWM(motor->id[motor->direction], 0);
-		motor->speed = 0;
-	}
+	uint8_T channel;
 
-	// If there is no speed encoder, this ensures the motor run
-	if (speed > 0)
-		speed = max(speed, MOTOR_MIN_SPEED);
+	// This can be replaced by a table or map!
+	if (motor == LEFT_DCMOTOR)
+		if (direction == FORWARD_DIRECTION)
+			channel = LEFT_MOTOR_CCW;
+		else
+			channel = LEFT_MOTOR_CW;
+	else
+		if (direction == FORWARD_DIRECTION)
+			channel = RIGHT_MOTOR_CW;
+		else
+			channel = RIGHT_MOTOR_CCW;
 
-	SetPCAPWM(motor->id[direction], speed);
-
-	motor->direction = direction;
-	motor->speed 	 = speed;
+	SetPCAPWM(channel, speed);
 
 } // END: DriveDCMotor()
 
@@ -110,7 +111,7 @@ void DriveDCMotor(dcMotor_T *motor, int8_T direction, uint8_T speed)
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
-*      PUBLICFUCTION()
+*      LOCALFUCTION()
 *      What this function is doing.
 *
 *  Inputs:

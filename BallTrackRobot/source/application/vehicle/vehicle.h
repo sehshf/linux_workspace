@@ -70,6 +70,7 @@ typedef struct
  * PROTOTYPES										*
  * **************************************************
  */
+void InitVehicle(void);
 void RunVehicle(uint16_T period);
 
 
