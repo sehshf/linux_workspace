@@ -40,11 +40,11 @@ int main()
 	// Real-time tasks
 	for (i = 0; i < NUM_TASKS; i++)
 	{
-		CreateRTTask(task[i], &attr, (int16_T)MAX_PRIO - i, &schedParam, TaskRoutine, (uint32_T *)i);
+		CreateRTTask(task[i], &attr, (int16_T)MAX_PRIO - i - 1, &schedParam, TaskRoutine, (uint32_T *)i);
 	}
 
 	// Base rate
-	schedParam.__sched_priority = MAX_PRIO + 1;
+	schedParam.__sched_priority = MAX_PRIO;
 
 	if (pthread_attr_setschedparam(&attr, &schedParam) != 0)
 	{

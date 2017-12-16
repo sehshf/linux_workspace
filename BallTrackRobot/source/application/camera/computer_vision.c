@@ -212,7 +212,6 @@ IplImage *FiltBall(IplImage *img)
 *             retrieves the ball location from the input image.
 *
 *  Outputs:
-*       find: Flag indicating if the ball is found.
 *
 *  Author: Ehsan Shafiei
 *          Feb 2017

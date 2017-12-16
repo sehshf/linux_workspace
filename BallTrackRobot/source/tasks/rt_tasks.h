@@ -37,7 +37,7 @@
  * DEFINITIONS										*
  * **************************************************
  */
-#define MAX_PRIO	(sched_get_priority_min(SCHED_FIFO) + NUM_TASKS)
+#define MAX_PRIO	(sched_get_priority_max(SCHED_FIFO))
 
 // Task period as multiplication of the baserate
 #define BASE_PERIOD			5		// 5 ms

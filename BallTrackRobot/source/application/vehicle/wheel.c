@@ -18,11 +18,6 @@
  * LOCAL DECLARATIONS								*
  * **************************************************
  */
-struct threadStruct
-{
-	wheel_T  *wheel;
-	uint16_T  nSteps;
-};
 
 
 /*
@@ -38,9 +33,10 @@ struct threadStruct
  * FILE SCOPE VARIABLES (static)					*
  * **************************************************
  */
-static pthread_t thread[NUM_WHEEL];						// Thread array for running in the step mode
-static boolean_T isRun[NUM_WHEEL] = {FALSE, FALSE};		// Running status of the threads
-static uint16_T  steps[NUM_WHEEL] = {0, 0};				// Number of steps driven by the wheel
+static pthread_t 		thread[NUM_WHEEL];						// Thread array for running in the step mode
+static pthread_attr_t 	attr[NUM_WHEEL];						// threads attributes
+static boolean_T 		isRun[NUM_WHEEL] = {FALSE, FALSE};		// Running status of the threads
+static uint16_T  		steps[NUM_WHEEL] = {0, 0};				// Number of steps driven by the wheel
 
 /*
  * **************************************************
@@ -49,6 +45,7 @@ static uint16_T  steps[NUM_WHEEL] = {0, 0};				// Number of steps driven by the 
  */
 static uint8_T SetMotor(uint8_T wheelID);
 static uint8_T SetSensor(uint8_T wheelID);
+static void InitStepDrive(void);
 static void StepDrive(wheel_T *wheel);
 static void *StepCounter(void *arg);
 
@@ -76,6 +73,7 @@ void InitWheels(void)
 {
 	InitDCMotors();
 	InitSpeedSnsrs();
+	InitStepDrive();
 
 } // END: InitWheels()
 
@@ -100,7 +98,7 @@ void InitWheels(void)
 */
 void DriveWheel(wheel_T *wheel, int8_T direction, uint8_T speed)
 {
-	uint16_T maxSteps;
+	const static uint16_T maxSteps = 20;
 
 	// Set the corresponding motor and sensor
 	wheel->motor  = SetMotor( wheel->id);
@@ -114,7 +112,6 @@ void DriveWheel(wheel_T *wheel, int8_T direction, uint8_T speed)
 
 	if (speed <= WHEEL_MIN_SPEED && speed > 0)	// Stepper drive mode
 	{
-		maxSteps 	 = SPEED_SENSOR_RES;
 		wheel->steps = speed * maxSteps / WHEEL_MIN_SPEED;
 
 		if (isRun[wheel->id] == FALSE)
@@ -213,6 +210,39 @@ static uint8_T SetSensor(uint8_T wheelID)
 /**
 *  -------------------------------------------------------  *
 *  FUNCTION:
+*      INITSTEPDRIVE()
+*      Initialize the thread attributes for step drive
+*      function.
+*
+*  Inputs:
+*
+*  Author: Ehsan Shafiei
+*  		   Dec 2017
+*  -------------------------------------------------------  *
+*/
+static void InitStepDrive(void)
+{
+	struct sched_param schedParam;
+
+	int32_T i;
+
+	for (i = 0; i < NUM_WHEEL; i++)
+	{
+		pthread_attr_init(&attr[i]);
+		pthread_attr_setinheritsched(&attr[i], PTHREAD_EXPLICIT_SCHED);
+		pthread_attr_setschedpolicy(&attr[i], SCHED_FIFO);
+
+		schedParam.__sched_priority = sched_get_priority_max(SCHED_FIFO) - i - 10;
+
+		pthread_attr_setschedparam(&attr[i], &schedParam);
+	}
+
+} // END: InitStepDrive()
+
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
 *      STEPDRIVE()
 *      Drive the DC motor step-by-step. Each step is
 *      as long as an encoder angel resolution.
@@ -226,7 +256,7 @@ static uint8_T SetSensor(uint8_T wheelID)
 */
 static void StepDrive(wheel_T *wheel)
 {
-	pthread_create(&thread[wheel->id], NULL, StepCounter, (void *)wheel);
+	pthread_create(&thread[wheel->id], &attr[wheel->id], StepCounter, (void *)wheel);
 
 	isRun[wheel->id] = TRUE;
 
