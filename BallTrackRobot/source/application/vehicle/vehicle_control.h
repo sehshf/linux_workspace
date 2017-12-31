@@ -31,7 +31,7 @@
  * DEFINITIONS										*
  * **************************************************
  */
-#define POSITION_SP		15				// Vehicle position setpoint [%] (here is the percent of normalized ball area)
+#define POSITION_SP		20				// Vehicle position setpoint [%] (here is the percent of normalized ball area)
 #define MOVE_RIGHT		0
 #define MOVE_LEFT 		1
 #define MOVE_STRAIGHT   2

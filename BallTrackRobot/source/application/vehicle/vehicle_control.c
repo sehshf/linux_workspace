@@ -59,14 +59,16 @@ static void DriveVehicle(movement_T *move);
 */
 void VehiclePositionControl(boolean_T vision, real32_T pos, int8_T panPos)
 {
-	const static int32_T POS_HYS = 2;
-	const static int8_t  PAN_HYS = 10;
+	const static int32_T 	POS_HYS = 5;
+	const static int8_T  	PAN_HYS = 30;
+	const static real32_T 	BACKWARD_RDCN = 0.5;
+	const static real32_T	Kp = 0.8;
 
 
-	static pid_T pid;
-
-	pid.k 	 = 0.15;
-	pid.ti 	 = 8;
+//	static pid_T pid;
+//
+//	pid.k 	 = 0.5;
+//	pid.ti 	 = 5;
 
 	real32_T  u, ePos;
 
@@ -76,46 +78,63 @@ void VehiclePositionControl(boolean_T vision, real32_T pos, int8_T panPos)
 							   .sharpness = 0 };
 
 	if (vision)
+	{
 		ePos	= POSITION_SP - pos;
+		printf("pos = %f\n", pos);
+	}
 	else
 		ePos = 0;
 
 	if (abs(ePos) > POS_HYS)
 	{
-		u = PIDControl(&pid, POSITION_SP, pos, 0.2);
+//		u = PIDControl(&pid, POSITION_SP, pos, 0.1);
+		u = Kp * ePos;
 
 		if (GETSIGN(u) > 0)
+		{
 			move.direction = FORWARD_DIRECTION;
+		}
 		else
+		{
 			move.direction = BACKWARD_DIRECTION;
+			u = 0.5 * u;	// Lower speed on backward
+		}
 
-		if (panPos < -PAN_HYS)
-		{
-			if (GETSIGN(u) > 0)
-				move.turn = MOVE_RIGHT;
-			else
-				move.turn = MOVE_LEFT;
-		}
-		else if (panPos > PAN_HYS)
-		{
-			if (GETSIGN(u) > 0)
-				move.turn = MOVE_LEFT;
-			else
-				move.turn = MOVE_RIGHT;
-		}
+//		if (panPos < -PAN_HYS)
+//		{
+//			if (GETSIGN(u) > 0)
+//				move.turn = MOVE_RIGHT;
+//			else
+//				move.turn = MOVE_LEFT;
+//
+//		}
+//		else if (panPos > PAN_HYS)
+//		{
+//			if (GETSIGN(u) > 0)
+//				move.turn = MOVE_LEFT;
+//			else
+//				move.turn = MOVE_RIGHT;
+//		}
+//		else
+//		{
+//			move.turn 		= MOVE_STRAIGHT;
+//		}
+
+		if (abs(panPos) > PAN_HYS)
+			move.sharpness = (int32_T)(abs(panPos) - PAN_HYS) * 100 / SERVO_POS_MAX;
 		else
-		{
-			move.turn = MOVE_STRAIGHT;
-		}
+			move.sharpness 	= 0;
 
 		move.speed = abs(u);
 
-		move.sharpness = (int32_T)abs(panPos) * 100 / SERVO_POS_MAX;
+
+//		printf("turn = %d, pan = %d, sharp = %u\n", move.turn, panPos, move.sharpness);
+//		printf("speed = %d\n", move.speed);
 	}
 	else
 	{
 		move.speed = 0;
-		pid.I = 0;
+//		pid.I = 0;
 	}
 
 	DriveVehicle(&move);
@@ -153,6 +172,8 @@ static void DriveVehicle(movement_T *move)
 
 	// Lower speed of the wheel associated with the turning side
 	lowerSpeed = (real32_T)move->speed * (100 - move->sharpness) / 100;
+
+//	printf("speedHigh = %u, sharp = %u\n", move->speed, move->sharpness);
 
 	if (move->turn == MOVE_RIGHT)
 	{

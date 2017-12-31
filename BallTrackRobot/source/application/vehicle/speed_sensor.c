@@ -60,7 +60,7 @@ static int32_T fdSpeedSnsr[NUM_SPEED_SNSR];
 */
 void InitSpeedSnsrs(void)
 {
-	sysGPIO_T 	gpio;
+	sysGPIO_T gpio;
 
 	/* Initialize left speed sensor */
 

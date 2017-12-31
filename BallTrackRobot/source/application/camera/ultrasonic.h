@@ -1,20 +1,20 @@
 /*
- * wheel.h
+ * ultrasonic.h
  *
- *  Created on: Oct 29, 2017
+ *  Created on: Dec 30, 2017
  *      Author: ses
  */
 
-#ifndef _WHEEL_H_
-#define _WHEEL_H_
+
+#ifndef _ULTRASONIC_H_
+#define _ULTRASONIC_H_
 
 /*
  * **************************************************
  * SYSTEM INCLUDE FILES								*
  * **************************************************
  */
-#include <pthread.h>
-#include <sched.h>
+#include <time.h>
 
 
 /*
@@ -22,8 +22,8 @@
  * APPLICATION INCLUDE FILES						*
  * **************************************************
  */
-#include "dc_motors.h"
-#include "speed_sensor.h"
+#include "portable.h"
+#include "gpio.h"
 
 
 /*
@@ -31,17 +31,16 @@
  * DEFINITIONS										*
  * **************************************************
  */
-#define WHEEL_STEP_THD		15		// Speed threshold [%] to drive in step mode
-#define WHEEL_STEP_SPEED	20		// Wheel speed in step drive mode (speed between the steps)
+#define ULTRASONIC_TRIG_PIN		19
+#define ULTRASONIC_ECHO_PIN		16
 
-// Wheel enumeration
+// Ultrasonic sensor enumeration
 enum
 {
-	LEFT_WHEEL,
-	RIGHT_WHEEL,
-	NUM_WHEEL
+	ULTRASONIC_TRIG,
+	ULTRASONIC_ECHO,
+	NUM_ULTRASONIC_PIN
 };
-
 
 /*
  * **************************************************
@@ -56,14 +55,6 @@ enum
  * TYPE DEFINITIONS									*
  * **************************************************
  */
-typedef struct
-{
-	uint8_T id;			// Wheel ID (left or right)
-	int8_T 	direction;
-	uint8_T motor;
-	uint8_T sensor;
-	uint8_T steps;		// Assigned number of steps when running in the step mode
-} wheel_T;
 
 
 /*
@@ -80,12 +71,11 @@ typedef struct
  * PROTOTYPES										*
  * **************************************************
  */
-void InitWheels(void);
-void DriveWheel(wheel_T *wheel, int8_T direction, uint8_T speed);
+void 	 InitUltrasonicSnsrs(void);
+real32_T ReadDistance(void);
 
 
-#endif // _WHEEL_H_
+#endif // _ULTRASONIC_H_
 
-// EOF: wheel.h
-
+// EOF: ultrasonic.h
 

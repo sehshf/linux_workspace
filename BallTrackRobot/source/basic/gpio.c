@@ -227,7 +227,8 @@ int32_T OpenSysGPIO(uint8_T pin)
 *      Read GPIO from SYSFS value file.
 *
 *  Inputs:
-*  		fd : descriptor of the opened value file.
+*  		fd 		: descriptor of the opened value file.
+*  		timeout	: Reading timeout
 *
 *  Outputs:
 *  		retVal : pin value (state)
@@ -244,8 +245,9 @@ int8_T ReadSysGPIO(int32_T fd, int32_T timeout)
 	pollFd_T fds;
 
 	fds.fd 	   = fd;
-	fds.events = POLLPRI;
+	fds.events = POLLPRI | POLLERR;
 
+	read (fd, &buf, 1); 	// Dummy read before poll() call to prevent immediate return
 	retPoll = poll(&fds, 1, timeout);
 	if (retPoll < 0)
 	{
@@ -273,6 +275,54 @@ int8_T ReadSysGPIO(int32_T fd, int32_T timeout)
 
 } // END: ReadSysGPIO()
 
+
+/**
+*  -------------------------------------------------------  *
+*  FUNCTION:
+*      WRITESYSGPIO()
+*      Write GPIO using SYSFS value file.
+*
+*  Inputs:
+*  		fd : descriptor of the opened value file.
+*  		val: Value to be written (TRUE or FALSE)
+*
+*  Outputs:
+*  		retVal : write result
+*
+*  Author: Ehsan Shafiei
+*  		   May 2017
+*  -------------------------------------------------------  *
+*/
+int8_T WriteSysGPIO(int32_T fd, boolean_T val)
+{
+	int32_T		retPoll, nBytes;
+	int8_T 		retVal = 0;
+	pollFd_T 	fds;
+
+	fds.fd 	   = fd;
+	fds.events = POLLOUT;
+
+	retPoll = poll(&fds, 1, 0);
+	if (retPoll < 0)
+	{
+		fprintf(stderr, "Failed to poll GPIO value file.\n");
+		exit(EXIT_FAILURE);
+	}
+	else
+	{
+		lseek(fd, 0, SEEK_SET);
+		if (val == TRUE)
+			nBytes = write(fd, "1", 1);
+		else
+			nBytes = write(fd, "0", 1);
+
+		if (nBytes == 1)
+			retVal = 1;
+	}
+
+	return retVal;
+
+} // END: WriteSysGPIO()
 
 /*
  * **************************************************

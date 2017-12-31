@@ -200,6 +200,7 @@ void ConfigSysGPIO(sysGPIO_T *sysGPIO);
 int32_T OpenSysGPIO(uint8_T pin);
 
 int8_T ReadSysGPIO(int32_T fd, int32_T timeout);
+int8_T WriteSysGPIO(int32_T fd, boolean_T val);
 
 
 #endif // _GPIO_H_

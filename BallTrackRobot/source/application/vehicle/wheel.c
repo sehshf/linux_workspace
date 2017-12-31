@@ -35,8 +35,10 @@
  */
 static pthread_t 		thread[NUM_WHEEL];						// Thread array for running in the step mode
 static pthread_attr_t 	attr[NUM_WHEEL];						// threads attributes
-static boolean_T 		isRun[NUM_WHEEL] = {FALSE, FALSE};		// Running status of the threads
 static uint16_T  		steps[NUM_WHEEL] = {0, 0};				// Number of steps driven by the wheel
+static boolean_T 		isRun[NUM_WHEEL] = {FALSE, FALSE};		// Running status of the threads
+
+const static uint16_T 	maxSteps = 5;
 
 /*
  * **************************************************
@@ -98,8 +100,6 @@ void InitWheels(void)
 */
 void DriveWheel(wheel_T *wheel, int8_T direction, uint8_T speed)
 {
-	const static uint16_T maxSteps = 20;
-
 	// Set the corresponding motor and sensor
 	wheel->motor  = SetMotor( wheel->id);
 	wheel->sensor = SetSensor(wheel->id);
@@ -110,26 +110,28 @@ void DriveWheel(wheel_T *wheel, int8_T direction, uint8_T speed)
 
 	wheel->direction = direction;
 
-	if (speed <= WHEEL_MIN_SPEED && speed > 0)	// Stepper drive mode
+	if (speed <= WHEEL_STEP_THD && speed > 0)	// Stepper drive mode
 	{
-		wheel->steps = speed * maxSteps / WHEEL_MIN_SPEED;
-
-		if (isRun[wheel->id] == FALSE)
-		{
-			steps[wheel->id] = 0;
-			StepDrive(wheel);
-		}
-		else if (wheel->steps <= steps[wheel->id])
-		{
-			DriveDCMotor(wheel->motor, direction, 0);
-			pthread_cancel(thread[wheel->id]);	// cancel the thread created for step-drive
-			isRun[wheel->id] = FALSE;
-			steps[wheel->id] = 0;
-		}
+		DriveDCMotor(wheel->motor, direction, WHEEL_STEP_THD);
+//		wheel->steps = speed * maxSteps / WHEEL_STEP_THD;
+//
+//		if (isRun[wheel->id] == FALSE)
+//		{
+//			steps[wheel->id] = 0;
+//			isRun[wheel->id] = TRUE;
+//			StepDrive(wheel);
+//		}
+//		else if (wheel->steps <= steps[wheel->id])
+//		{
+//			DriveDCMotor(wheel->motor, direction, 0);
+//			pthread_cancel(thread[wheel->id]);	// cancel the thread created for step-drive
+//			isRun[wheel->id] = FALSE;
+//			steps[wheel->id] = 0;
+//		}
 	}
 	else	// Normal drive mode
 	{
-		if (isRun[wheel->id == TRUE])
+		if (isRun[wheel->id] == TRUE)
 		{
 			pthread_cancel(thread[wheel->id]);	// cancel the thread created for step-drive
 			isRun[wheel->id] = FALSE;
@@ -257,8 +259,6 @@ static void InitStepDrive(void)
 static void StepDrive(wheel_T *wheel)
 {
 	pthread_create(&thread[wheel->id], &attr[wheel->id], StepCounter, (void *)wheel);
-
-	isRun[wheel->id] = TRUE;
 
 	/* drive the motor with specified step speed the motor
 	 * will be stopped by the thread function when it
