@@ -59,18 +59,11 @@ static void DriveVehicle(movement_T *move);
 */
 void VehiclePositionControl(boolean_T vision, real32_T pos, int8_T panPos)
 {
-	const static int32_T 	POS_HYS = 5;
-	const static int8_T  	PAN_HYS = 30;
-	const static real32_T 	BACKWARD_RDCN = 0.5;
-	const static real32_T	Kp = 0.8;
+	const static int32_T 	POS_HYS = 10;
+	const static int8_T  	PAN_HYS = 20;
+	const static real32_T	K_P = 0.5;
 
-
-//	static pid_T pid;
-//
-//	pid.k 	 = 0.5;
-//	pid.ti 	 = 5;
-
-	real32_T  u, ePos;
+	real32_T  x, u, ePos;
 
 	static movement_T move = { .direction = FORWARD_DIRECTION,
 							   .turn 	  = MOVE_STRAIGHT,
@@ -79,62 +72,55 @@ void VehiclePositionControl(boolean_T vision, real32_T pos, int8_T panPos)
 
 	if (vision)
 	{
-		ePos	= POSITION_SP - pos;
-		printf("pos = %f\n", pos);
+		// Calculate distance [%]
+		x = 10 * (10 - sqrt(pos));
+
+		// Position error
+		ePos = POSITION_SP - x;
 	}
 	else
 		ePos = 0;
 
 	if (abs(ePos) > POS_HYS)
 	{
-//		u = PIDControl(&pid, POSITION_SP, pos, 0.1);
-		u = Kp * ePos;
+		// Control signal
+		u = K_P * ePos;
 
 		if (GETSIGN(u) > 0)
-		{
+			move.direction = BACKWARD_DIRECTION;
+		else
 			move.direction = FORWARD_DIRECTION;
+
+		if (panPos < -PAN_HYS)
+		{
+			if (move.direction == FORWARD_DIRECTION)
+				move.turn = MOVE_RIGHT;
+			else
+				move.turn = MOVE_LEFT;
+
+		}
+		else if (panPos > PAN_HYS)
+		{
+			if (move.direction == FORWARD_DIRECTION)
+				move.turn = MOVE_LEFT;
+			else
+				move.turn = MOVE_RIGHT;
 		}
 		else
 		{
-			move.direction = BACKWARD_DIRECTION;
-			u = 0.5 * u;	// Lower speed on backward
+			move.turn 		= MOVE_STRAIGHT;
 		}
 
-//		if (panPos < -PAN_HYS)
-//		{
-//			if (GETSIGN(u) > 0)
-//				move.turn = MOVE_RIGHT;
-//			else
-//				move.turn = MOVE_LEFT;
-//
-//		}
-//		else if (panPos > PAN_HYS)
-//		{
-//			if (GETSIGN(u) > 0)
-//				move.turn = MOVE_LEFT;
-//			else
-//				move.turn = MOVE_RIGHT;
-//		}
-//		else
-//		{
-//			move.turn 		= MOVE_STRAIGHT;
-//		}
-
 		if (abs(panPos) > PAN_HYS)
-			move.sharpness = (int32_T)(abs(panPos) - PAN_HYS) * 100 / SERVO_POS_MAX;
+			move.sharpness = (int32_T)abs(panPos) * 100 / SERVO_POS_MAX;
 		else
 			move.sharpness 	= 0;
 
 		move.speed = abs(u);
-
-
-//		printf("turn = %d, pan = %d, sharp = %u\n", move.turn, panPos, move.sharpness);
-//		printf("speed = %d\n", move.speed);
 	}
 	else
 	{
 		move.speed = 0;
-//		pid.I = 0;
 	}
 
 	DriveVehicle(&move);
@@ -165,15 +151,13 @@ void VehiclePositionControl(boolean_T vision, real32_T pos, int8_T panPos)
 */
 static void DriveVehicle(movement_T *move)
 {
-	static wheel_T leftWheel  = {LEFT_WHEEL , FORWARD_DIRECTION, 0};
-	static wheel_T rightWheel = {RIGHT_WHEEL, FORWARD_DIRECTION, 0};
+	static wheel_T leftWheel  = {LEFT_WHEEL , FORWARD_DIRECTION};
+	static wheel_T rightWheel = {RIGHT_WHEEL, FORWARD_DIRECTION};
 
 	real32_T lowerSpeed;
 
 	// Lower speed of the wheel associated with the turning side
 	lowerSpeed = (real32_T)move->speed * (100 - move->sharpness) / 100;
-
-//	printf("speedHigh = %u, sharp = %u\n", move->speed, move->sharpness);
 
 	if (move->turn == MOVE_RIGHT)
 	{

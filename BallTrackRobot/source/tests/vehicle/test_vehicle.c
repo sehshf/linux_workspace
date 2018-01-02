@@ -43,12 +43,15 @@ int main(int argc, char *argv[])
 //		printf("Enter sharpness:\n");
 //		scanf("%hhd", &sharpness);
 
-		for (int i = 0; i < 3; i++)
-		{
-			DriveWheel(&leftWheel, speed);
-			DriveWheel(&rightWheel, speed);
-			usleep(200000);
-		}
+		DriveWheel(&leftWheel , FORWARD_DIRECTION, speed);
+		DriveWheel(&rightWheel, FORWARD_DIRECTION, speed);
+
+		sleep(2);
+
+		DriveWheel(&leftWheel , FORWARD_DIRECTION, 0);
+		DriveWheel(&rightWheel, FORWARD_DIRECTION, 0);
+
+
 
 //		rpm = ReadSpeedSnsr(leftSnsr);
 //		printf("rpm = %d\n", rpm);

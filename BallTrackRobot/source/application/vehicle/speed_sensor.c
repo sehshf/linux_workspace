@@ -67,8 +67,8 @@ void InitSpeedSnsrs(void)
 	// Setting for the GPIO pin
 	gpio.pin  		= LEFT_SPEED_SENSOR_PIN;
 	gpio.direction	= SYS_GPIO_IN;
-	gpio.trigger 	= SYS_GPIO_FALLING;
-	gpio.actvLow	= TRUE;
+	gpio.trigger 	= SYS_GPIO_BOTH;
+	gpio.actvLow	= FALSE;
 
 	// Apply the GPIO setting
 	ConfigSysGPIO(&gpio);
@@ -82,8 +82,8 @@ void InitSpeedSnsrs(void)
 	// Setting for the GPIO pin
 	gpio.pin  		= RIGHT_SPEED_SENSOR_PIN;
 	gpio.direction	= SYS_GPIO_IN;
-	gpio.trigger 	= SYS_GPIO_FALLING;
-	gpio.actvLow	= TRUE;
+	gpio.trigger 	= SYS_GPIO_BOTH;
+	gpio.actvLow	= FALSE;
 
 	// Apply the GPIO setting
 	ConfigSysGPIO(&gpio);

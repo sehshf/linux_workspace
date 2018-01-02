@@ -31,7 +31,6 @@
  * DEFINITIONS										*
  * **************************************************
  */
-#define WHEEL_STEP_THD		15		// Speed threshold [%] to drive in step mode
 #define WHEEL_STEP_SPEED	20		// Wheel speed in step drive mode (speed between the steps)
 
 // Wheel enumeration

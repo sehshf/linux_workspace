@@ -33,12 +33,13 @@
  * FILE SCOPE VARIABLES (static)					*
  * **************************************************
  */
-static pthread_t 		thread[NUM_WHEEL];						// Thread array for running in the step mode
-static pthread_attr_t 	attr[NUM_WHEEL];						// threads attributes
-static uint16_T  		steps[NUM_WHEEL] = {0, 0};				// Number of steps driven by the wheel
-static boolean_T 		isRun[NUM_WHEEL] = {FALSE, FALSE};		// Running status of the threads
+static pthread_t 		thread[NUM_WHEEL];							// Thread array for running in the step mode
+static pthread_attr_t 	attr[NUM_WHEEL];							// threads attributes
+static uint16_T  		steps[NUM_WHEEL] = {0, 0};					// Number of steps driven by the wheel
+static boolean_T 		isRun[NUM_WHEEL] = {FALSE, FALSE};			// Running status of the threads
+static boolean_T 		isFinished[NUM_WHEEL] = {FALSE, FALSE};		// Finishing status of the thread routine
 
-const static uint16_T 	maxSteps = 5;
+const static uint16_T 	MAX_STEPS = 5;
 
 /*
  * **************************************************
@@ -100,6 +101,8 @@ void InitWheels(void)
 */
 void DriveWheel(wheel_T *wheel, int8_T direction, uint8_T speed)
 {
+	speed = min(MOTOR_MAX_SPEED, speed);
+
 	// Set the corresponding motor and sensor
 	wheel->motor  = SetMotor( wheel->id);
 	wheel->sensor = SetSensor(wheel->id);
@@ -110,24 +113,33 @@ void DriveWheel(wheel_T *wheel, int8_T direction, uint8_T speed)
 
 	wheel->direction = direction;
 
-	if (speed <= WHEEL_STEP_THD && speed > 0)	// Stepper drive mode
+	if (speed <= MOTOR_MIN_SPEED && speed > 0)	// Stepper drive mode
 	{
-		DriveDCMotor(wheel->motor, direction, WHEEL_STEP_THD);
-//		wheel->steps = speed * maxSteps / WHEEL_STEP_THD;
-//
-//		if (isRun[wheel->id] == FALSE)
-//		{
-//			steps[wheel->id] = 0;
-//			isRun[wheel->id] = TRUE;
-//			StepDrive(wheel);
-//		}
-//		else if (wheel->steps <= steps[wheel->id])
-//		{
-//			DriveDCMotor(wheel->motor, direction, 0);
-//			pthread_cancel(thread[wheel->id]);	// cancel the thread created for step-drive
-//			isRun[wheel->id] = FALSE;
-//			steps[wheel->id] = 0;
-//		}
+		wheel->steps = speed * MAX_STEPS / MOTOR_MIN_SPEED;
+
+		if (isRun[wheel->id] == FALSE)
+		{
+			steps[wheel->id] = 0;
+			if (wheel->steps > 0)
+			{
+				isRun[wheel->id] = TRUE;
+				StepDrive(wheel);
+			}
+		}
+		else if (wheel->steps <= steps[wheel->id])
+		{
+			DriveDCMotor(wheel->motor, direction, 0);
+			pthread_cancel(thread[wheel->id]);	// cancel the thread created for step-drive
+			isRun[wheel->id] = FALSE;
+			steps[wheel->id] = 0;
+		}
+		else if (isFinished[wheel->id] == TRUE)
+		{
+			pthread_cancel(thread[wheel->id]);	// cancel the thread created for step-drive
+			isRun[wheel->id] = FALSE;
+			isFinished[wheel->id] = FALSE;
+			steps[wheel->id] = 0;
+		}
 	}
 	else	// Normal drive mode
 	{
@@ -258,13 +270,14 @@ static void InitStepDrive(void)
 */
 static void StepDrive(wheel_T *wheel)
 {
-	pthread_create(&thread[wheel->id], &attr[wheel->id], StepCounter, (void *)wheel);
-
 	/* drive the motor with specified step speed the motor
 	 * will be stopped by the thread function when it
 	 * ran with the requested number of steps
 	 */
 	DriveDCMotor(wheel->motor, wheel->direction, WHEEL_STEP_SPEED);
+
+	// Handle step drive in a separated thread
+	pthread_create(&thread[wheel->id], &attr[wheel->id], StepCounter, (void *)wheel);
 
 } // END: StepDrive()
 
@@ -290,16 +303,17 @@ static void *StepCounter(void *arg)
 {
 	wheel_T *wheel = (wheel_T *)arg;
 
-	int32_T i, maxStep = wheel->steps, id = wheel->id;
+	int32_T i, nSteps = wheel->steps, id = wheel->id;
 	uint8_T motor = wheel->motor, sensor = wheel->sensor;
 	int8_T direction = wheel->direction;
 
-	for (i = 0; i < maxStep; i++)
+	for (i = 0; i < nSteps; i++)
 	{
 		// Blocking read
 		if (ReadSpeedPulse(sensor))
 			steps[id]++;
 	}
+	isFinished[id] = TRUE;
 	DriveDCMotor(motor, direction, 0);
 
 	return NULL;

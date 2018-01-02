@@ -36,6 +36,15 @@
 #define RIGHT_MOTOR_CCW 	PWM_6
 #define RIGHT_MOTOR_CW 		PWM_7
 
+// Voltage range
+#define MOTOR_MIN_V			3
+#define MOTOR_MAX_V			6
+#define MOTOR_BAT_V			15	// Battery voltage
+
+#define MOTOR_MIN_SPEED		20	// (100 * MOTOR_MIN_V / MOTOR_BAT_V)
+#define MOTOR_MAX_SPEED		40	// (100 * MOTOR_MAX_V / MOTOR_BAT_V)
+
+
 // DC motors enumeration
 enum
 {
