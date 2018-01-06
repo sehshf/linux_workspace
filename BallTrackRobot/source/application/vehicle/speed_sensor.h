@@ -35,7 +35,7 @@
 #define RIGHT_SPEED_SENSOR_PIN 		20		// GPIO pin number
 
 #define SPEED_SENSOR_RES			20		// Sensor resolution: pulses/revolution
-#define SPEED_STOP_TIME 			500		// Time to detect wheel stopped [ms]
+#define SPEED_STOP_TIME 			20		// Time to detect wheel stopped [ms]
 
 // Speed sensors enumeration
 enum

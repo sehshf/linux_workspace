@@ -168,18 +168,13 @@ uint16_T ReadSpeedSnsr(uint8_T sensor)
 */
 boolean_T ReadSpeedPulse(uint8_T sensor)
 {
-	uint8_T i, cnt = 0;
-
 	boolean_T pulse = FALSE;
 
-	for (i = 0; i < 2; i++)
-	{
-		// This is a blocking read
-		if (ReadSysGPIO(fdSpeedSnsr[sensor], SPEED_STOP_TIME) != -1)
-			cnt++;
-	}
-	if (cnt == 2)
+	// This is a blocking read
+	if (ReadSysGPIO(fdSpeedSnsr[sensor], SPEED_STOP_TIME) != -1)
 		pulse = TRUE;
+	else
+		pulse = FALSE;
 
 	return pulse;
 

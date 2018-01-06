@@ -130,6 +130,7 @@ static void CameraHandler(cameraOutputs_T *outputs)
 	if (img != NULL)
 	{
 		imgFild  = FiltBall(img);
+
 		FindBall(imgFild, &(outputs->ball));
 	}
 

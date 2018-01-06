@@ -34,12 +34,13 @@
  * **************************************************
  */
 static pthread_t 		thread[NUM_WHEEL];							// Thread array for running in the step mode
-static pthread_attr_t 	attr[NUM_WHEEL];							// threads attributes
+static pthread_attr_t 	attr[NUM_WHEEL];							// Threads attributes
+static pthread_mutex_t 	mutx[NUM_WHEEL];							// Thread mutex
 static uint16_T  		steps[NUM_WHEEL] = {0, 0};					// Number of steps driven by the wheel
 static boolean_T 		isRun[NUM_WHEEL] = {FALSE, FALSE};			// Running status of the threads
 static boolean_T 		isFinished[NUM_WHEEL] = {FALSE, FALSE};		// Finishing status of the thread routine
 
-const static uint16_T 	MAX_STEPS = 5;
+const static uint16_T 	MAX_STEPS = 8;
 
 /*
  * **************************************************
@@ -129,13 +130,13 @@ void DriveWheel(wheel_T *wheel, int8_T direction, uint8_T speed)
 		else if (wheel->steps <= steps[wheel->id])
 		{
 			DriveDCMotor(wheel->motor, direction, 0);
-			pthread_cancel(thread[wheel->id]);	// cancel the thread created for step-drive
+			pthread_detach(thread[wheel->id]);	// detach the thread created for step-drive
 			isRun[wheel->id] = FALSE;
 			steps[wheel->id] = 0;
 		}
 		else if (isFinished[wheel->id] == TRUE)
 		{
-			pthread_cancel(thread[wheel->id]);	// cancel the thread created for step-drive
+			pthread_detach(thread[wheel->id]);	// detach the thread created for step-drive
 			isRun[wheel->id] = FALSE;
 			isFinished[wheel->id] = FALSE;
 			steps[wheel->id] = 0;
@@ -145,7 +146,7 @@ void DriveWheel(wheel_T *wheel, int8_T direction, uint8_T speed)
 	{
 		if (isRun[wheel->id] == TRUE)
 		{
-			pthread_cancel(thread[wheel->id]);	// cancel the thread created for step-drive
+			pthread_detach(thread[wheel->id]);	// detach the thread created for step-drive
 			isRun[wheel->id] = FALSE;
 			steps[wheel->id] = 0;
 		}
@@ -311,9 +312,16 @@ static void *StepCounter(void *arg)
 	{
 		// Blocking read
 		if (ReadSpeedPulse(sensor))
+		{
+			pthread_mutex_lock(&mutx[id]);
 			steps[id]++;
+			pthread_mutex_unlock(&mutx[id]);
+		}
 	}
+	pthread_mutex_lock(&mutx[id]);
 	isFinished[id] = TRUE;
+	pthread_mutex_unlock(&mutx[id]);
+
 	DriveDCMotor(motor, direction, 0);
 
 	return NULL;

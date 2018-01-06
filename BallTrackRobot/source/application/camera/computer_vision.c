@@ -185,7 +185,7 @@ IplImage *FiltBall(IplImage *img)
 	static IplImage *imgTmp  = cvCreateImage(CvSize(CV_SIZE_W, CV_SIZE_H), IPL_DEPTH_8U, 3);
     static IplImage *imgFild = cvCreateImage(CvSize(CV_SIZE_W, CV_SIZE_H), IPL_DEPTH_8U, 1);
 
-    // Covert image color to HSV color space
+    // Convert image color to HSV color space
     cvCvtColor(img, imgTmp, CV_BGR2HSV);
 
     // Filter the image within the HSV range
@@ -255,6 +255,7 @@ void FindBall(IplImage *img, targetObj_T *ball)
             }
         }
     }
+
 } // END: FindBall()
 
 

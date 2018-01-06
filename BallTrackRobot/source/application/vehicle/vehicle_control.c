@@ -112,7 +112,7 @@ void VehiclePositionControl(boolean_T vision, real32_T pos, int8_T panPos)
 		}
 
 		if (abs(panPos) > PAN_HYS)
-			move.sharpness = (int32_T)abs(panPos) * 100 / SERVO_POS_MAX;
+			move.sharpness = (int32_T)(abs(panPos) - POS_HYS) * 100 / SERVO_POS_MAX;
 		else
 			move.sharpness 	= 0;
 
